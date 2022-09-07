@@ -21,8 +21,8 @@ public class PersonDaoImplTest {
     @Test
     public void getPersonsReturnsExpectedSizeAndPersonFirstName() {
         List<Person> persons = Arrays.asList(
-                new Person("john", "allain", "logbessou", "paris", 123, "12-15-99", "an@gmai.com"),
-                new Person("joe", "allain", "logbessou", "paris", 123, "12-15-99", "an@gmai.com")
+                Person.builder().firstName("john").build(),
+                Person.builder().firstName("jean").build()
         );
         when(dataStoreManager.getPersons()).thenReturn(persons);
 

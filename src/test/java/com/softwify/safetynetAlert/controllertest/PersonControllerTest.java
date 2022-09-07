@@ -29,8 +29,8 @@ public class PersonControllerTest {
     @Test
     public void testShouldVerifyThatControllerReturnOkStatusAndPerssonLengthIsCorrect() throws Exception {
         List<Person> persons = Arrays.asList(
-                new Person("john", "allain", "logbessou", "paris", 123, "12-15-99", "an@gmai.com"),
-                new Person("joe", "allain", "logbessou", "paris", 123, "12-15-99", "an@gmai.com")
+                Person.builder().firstName("john").build(),
+                Person.builder().firstName("jean").build()
         );
         when(personService.findAll()).thenReturn(persons);
 
