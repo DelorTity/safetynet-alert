@@ -1,6 +1,5 @@
 package com.softwify.safetynetAlert.controller;
 
-import com.softwify.safetynetAlert.dao.DataStoreManager;
 import com.softwify.safetynetAlert.model.Person;
 import com.softwify.safetynetAlert.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ public class PersonController {
     @Autowired
     private PersonService personService;
 
-    //Récupére la liste des personnes
     @GetMapping(value = "/persons")
     public List<Person> findAll() {
         return personService.findAll();

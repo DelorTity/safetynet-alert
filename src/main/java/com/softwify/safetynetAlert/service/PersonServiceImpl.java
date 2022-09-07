@@ -9,9 +9,11 @@ import java.util.List;
 
 @Service
 public class PersonServiceImpl implements PersonService {
-
-    @Autowired
     private PersonDao personDao;
+
+    public PersonServiceImpl(PersonDao personDao) {
+        this.personDao = personDao;
+    }
 
     @Override
     public List<Person> findAll() {

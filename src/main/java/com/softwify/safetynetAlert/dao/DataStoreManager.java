@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.softwify.safetynetAlert.model.FireStation;
 import com.softwify.safetynetAlert.model.MedicalRecord;
 import com.softwify.safetynetAlert.model.Person;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
