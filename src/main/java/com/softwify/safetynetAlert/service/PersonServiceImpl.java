@@ -1,14 +1,16 @@
 package com.softwify.safetynetAlert.service;
 
 import com.softwify.safetynetAlert.dao.PersonDao;
+import com.softwify.safetynetAlert.exceptions.PersonNotFoundException;
 import com.softwify.safetynetAlert.model.Person;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PersonServiceImpl implements PersonService {
+
     private PersonDao personDao;
 
     public PersonServiceImpl(PersonDao personDao) {
@@ -18,5 +20,11 @@ public class PersonServiceImpl implements PersonService {
     @Override
     public List<Person> findAll() {
         return personDao.findAll();
+    }
+
+    @Override
+    public Person findByFirstnameLastname(String firstName, String lastName) {
+        Optional<Person> optionalPerson = personDao.findPersonByFirstnameAndLastname(firstName, lastName);
+        return optionalPerson.orElseThrow(PersonNotFoundException::new);
     }
 }

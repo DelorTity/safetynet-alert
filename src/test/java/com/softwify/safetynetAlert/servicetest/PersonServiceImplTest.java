@@ -1,26 +1,48 @@
 package com.softwify.safetynetAlert.servicetest;
 
 import com.softwify.safetynetAlert.dao.PersonDao;
+import com.softwify.safetynetAlert.exceptions.PersonNotFoundException;
 import com.softwify.safetynetAlert.model.Person;
 import com.softwify.safetynetAlert.service.PersonServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
 public class PersonServiceImplTest {
     PersonDao personDao = Mockito.mock(PersonDao.class);
     PersonServiceImpl personService = new PersonServiceImpl(personDao);
 
     @Test
     public void testShouldVerifyTheNumberOfTimeThatPersonDaoIsCallIntoPersonService() {
-        List<Person> persons = personService.findAll();
+        personService.findAll();
         verify(personDao, times(1)).findAll();
+    }
+
+    @Test
+    public void getPersonByFirstnameAndLastnameShouldReturnThePerson() {
+        String firstName = "John";
+        String lastName = "Boyd";
+        Person person = Person.builder().firstName("John").lastName("Boyd").build();
+        Optional<Person> optionalPerson = Optional.of(person);
+        when(personDao.findPersonByFirstnameAndLastname(firstName, lastName)).thenReturn(optionalPerson);
+
+        Person personRetrieved = personService.findByFirstnameLastname(firstName, lastName);
+        assertNotNull(personRetrieved);
+        assertEquals("John", personRetrieved.getFirstName());
+        assertEquals("Boyd", personRetrieved.getLastName());
+
+        verify(personDao, times(1)).findPersonByFirstnameAndLastname(firstName, lastName);
+    }
+
+    @Test
+    public void getPersonByFirstnameAndLastnameShouldThrowExceptionWhenThereIsNoPerson() {
+        when(personDao.findPersonByFirstnameAndLastname(anyString(), anyString())).thenReturn(Optional.empty());
+
+        assertThrows(PersonNotFoundException.class, () -> personService.findByFirstnameLastname("Jack", "James"));
+        verify(personDao, times(1)).findPersonByFirstnameAndLastname("Jack", "James");
     }
 }
