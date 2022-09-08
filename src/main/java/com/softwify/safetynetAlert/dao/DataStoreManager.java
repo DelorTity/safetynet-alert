@@ -31,6 +31,10 @@ public class DataStoreManager implements CommandLineRunner {
 		return dataStore.getPersons();
 	}
 
+	public List<FireStation> getFireStation() {
+		return dataStore.getFireStations();
+	}
+
 	private static class DataStore {
 		private List<Person> persons;
 
