@@ -6,4 +6,8 @@ import java.util.List;
 
 public interface PersonService {
     List<Person> findAll();
+
+    Person findByFirstnameLastname(String firstName, String lastName);
+
+    Person save(Person personList);
 }
