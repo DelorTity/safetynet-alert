@@ -28,4 +28,25 @@ public class PersonDaoImpl implements PersonDao {
         }
         return Optional.empty();
     }
+
+ /*   public Optional<Person> checkExistingPerson(String firstName, String lastName) {
+        List<Person> persons = dataStoreManager.getPersons();
+        for (Person person : persons) {
+            if (person.getFirstName() != firstName && person.getLastName() != lastName) {
+                return Optional.of(person);
+            }
+        }
+        return Optional.empty();
+    }*/
+    @Override
+    public Person addPerson(Person person) {
+        Optional<Person> personOptional = findPersonByFirstnameAndLastname(person.getFirstName(), person.getLastName());
+        if (personOptional.isPresent()) {
+            return null;
+        }
+
+        List<Person> persons = dataStoreManager.getPersons();
+        persons.add(person);
+        return person;
+    }
 }

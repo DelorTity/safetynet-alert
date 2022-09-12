@@ -1,6 +1,7 @@
 package com.softwify.safetynetAlert.servicetest;
 
 import com.softwify.safetynetAlert.dao.PersonDao;
+import com.softwify.safetynetAlert.exceptions.PersonAlreadyExistsException;
 import com.softwify.safetynetAlert.exceptions.PersonNotFoundException;
 import com.softwify.safetynetAlert.model.Person;
 import com.softwify.safetynetAlert.service.PersonServiceImpl;
@@ -44,5 +45,24 @@ public class PersonServiceImplTest {
 
         assertThrows(PersonNotFoundException.class, () -> personService.findByFirstnameLastname("Jack", "James"));
         verify(personDao, times(1)).findPersonByFirstnameAndLastname("Jack", "James");
+    }
+
+    @Test
+    public void saveShouldVerifyThatPersonSaveIsReturn() {
+        Person person = Person.builder().firstName("John").lastName("Boyd").build();
+        when(personDao.addPerson(person)).thenReturn(person);
+
+        Person personSave = personService.savePerson(person);
+        assertEquals("John", personSave.getFirstName());
+        assertEquals("Boyd", personSave.getLastName());
+
+        verify(personDao, times(1)).addPerson(person);
+    }
+
+    @Test
+    public void saveShouldThrowExceptionWhenThePersonIsNotSave() {
+        Person person = Person.builder().firstName("John").lastName("Boyd").build();
+        assertThrows(PersonAlreadyExistsException.class, () -> personService.savePerson(person) );
+        verify(personDao, times(1)).addPerson(person);
     }
 }

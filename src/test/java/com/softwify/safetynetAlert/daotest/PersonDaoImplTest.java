@@ -6,6 +6,7 @@ import com.softwify.safetynetAlert.model.Person;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -62,5 +63,30 @@ public class PersonDaoImplTest {
         assertEquals("john", optionalPerson.get().getFirstName());
         assertEquals("pierre", optionalPerson.get().getLastName());
         verify(dataStoreManager, times(1)).getPersons();
+    }
+
+    @Test
+    public void testShouldVerifyThatWhenSaveCorrect() {
+        List<Person> arrayPersons = Arrays.asList(
+                Person.builder().firstName("john").lastName("pierre").build(),
+                Person.builder().firstName("jean").lastName("alfred").build()
+        );
+        List<Person> persons = new ArrayList<>(arrayPersons);
+
+        when(dataStoreManager.getPersons()).thenReturn(persons);
+
+        Person person = Person.builder()
+                .firstName("John")
+                .lastName("Boyd")
+                .address("logpom")
+                .city("douala")
+                .zip(32)
+                .phone("12-43")
+                .email("akl@gmail.com")
+                .build();
+
+        personDao.addPerson(person);
+
+        assertEquals(3, persons.size());
     }
 }

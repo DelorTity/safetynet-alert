@@ -5,11 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.softwify.safetynetAlert.model.FireStation;
 import com.softwify.safetynetAlert.model.MedicalRecord;
 import com.softwify.safetynetAlert.model.Person;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.FileCopyUtils;
 
 import java.io.InputStream;
 import java.util.List;
@@ -20,12 +18,10 @@ public class DataStoreManager implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		// Read file from resources folder
 		ClassPathResource resource = new ClassPathResource("data.json");
 		InputStream inputStream = resource.getInputStream();
 
 		dataStore = new ObjectMapper().readValue(inputStream, DataStore.class);
-		System.out.println("Data");
 	}
 
 	public List<Person> getPersons() {
