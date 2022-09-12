@@ -1,12 +1,11 @@
 package com.softwify.safetynetAlert.service;
 
 import com.softwify.safetynetAlert.dao.PersonDao;
+import com.softwify.safetynetAlert.ecception.PersonAlreadyExitException;
 import com.softwify.safetynetAlert.ecception.PersonNotFoundException;
 import com.softwify.safetynetAlert.model.Person;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,7 +30,10 @@ public class PersonServiceImpl implements PersonService {
     }
     @Override
     public Person save(Person person) {
-        List<Person> persons = Collections.singletonList(personDao.addNewPerson(person));
-        return personDao.addNewPerson(person);
+        Person addNewPerson = personDao.addNewPerson(person);
+        if(addNewPerson == null) {
+            throw new PersonAlreadyExitException();
+        }
+        return addNewPerson;
     }
 }

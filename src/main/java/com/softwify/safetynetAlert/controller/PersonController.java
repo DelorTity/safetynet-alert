@@ -1,12 +1,15 @@
 package com.softwify.safetynetAlert.controller;
 
+import com.softwify.safetynetAlert.ecception.PersonAlreadyExitException;
 import com.softwify.safetynetAlert.ecception.PersonNotFoundException;
 import com.softwify.safetynetAlert.model.Person;
 import com.softwify.safetynetAlert.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -32,7 +35,13 @@ public class PersonController {
     }
 
     @PostMapping
-    public Person save(@RequestBody Person person) {
-       return personService.save(person);
+    public ResponseEntity<Person> save(@RequestBody Person person) throws Exception{
+        try {
+            Person save = personService.save(person);
+            return ResponseEntity.ok(save);
+        } catch (PersonAlreadyExitException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
+
 }

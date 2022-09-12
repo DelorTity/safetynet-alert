@@ -1,6 +1,7 @@
 package com.softwify.safetynetAlert.dao;
 
 import com.softwify.safetynetAlert.model.Person;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -33,7 +34,17 @@ public class PersonDaoImpl implements PersonDao {
     @Override
     public Person addNewPerson(Person person) {
         List<Person> persons = dataStoreManager.getPersons();
-        persons.add(person);
+        Optional<Person> personByFirstnameAndLastname = findPersonByFirstnameAndLastname(person.getFirstName(), person.getLastName());
+        if(personByFirstnameAndLastname.isPresent()) {
+            return null;
+        } else {
+            persons.add(person);
+        }
         return person;
+    }
+
+    @Override
+    public ResponseEntity<Person> upDate(String firstName, String lastName) {
+
     }
 }
