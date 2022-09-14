@@ -71,12 +71,12 @@ public class PersonServiceImplTest {
 
     @Test
     void updateIfPersonExits() {
-        Optional<Person> person = Optional.of(Person.builder().firstName("Delor").lastName("Tatus").zip(345).build());
+        Person person = Person.builder().firstName("Delor").lastName("Tatus").zip(345).build();
 
-        when(personDao.update(person.get())).thenReturn(person);
-        personService.update(person.get());
-        person.get().setZip(656);
-        assertEquals(656, person.get().getZip());
+        when(personDao.update(person)).thenReturn(Optional.of(person));
+        Optional<Person> updatedOptionalPerson = personService.update(person);
+
+        assertTrue(updatedOptionalPerson.isPresent());
     }
 
     @Test
@@ -94,8 +94,9 @@ public class PersonServiceImplTest {
                 .build();
         when(personDao.delete(anyString(), anyString())).thenReturn(Optional.of(person));
 
-        personService.delete("John", "pierre");
-        verify(personDao, times(1)).delete(anyString(), anyString());
+        Optional<Person> deletedPerson = personService.delete("John", "pierre");
+        assertTrue(deletedPerson.isPresent());
+        verify(personDao, times(1)).delete("John", "pierre");
     }
 
     @Test
