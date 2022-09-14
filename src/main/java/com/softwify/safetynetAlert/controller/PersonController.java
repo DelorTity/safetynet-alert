@@ -11,6 +11,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/persons")
@@ -44,4 +45,24 @@ public class PersonController {
         }
     }
 
+    @PutMapping
+    public ResponseEntity<Person> update(@RequestBody Person person) throws Exception {
+        try {
+            Optional<Person> optionalPerson = personService.update(person);
+            Person updatedPerson = optionalPerson.get();
+            return ResponseEntity.ok(updatedPerson);
+        } catch (PersonNotFoundException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @DeleteMapping(value = "/{firstname}/{lastname}")
+    public ResponseEntity<Person> delete (@PathVariable String firstname, @PathVariable String lastname) {
+        try {
+            personService.delete(firstname, lastname);
+            return ResponseEntity.noContent().build();
+        } catch (PersonNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

@@ -52,7 +52,7 @@ public class PersonServiceImplTest {
     }
 
     @Test
-    void saveIfDoesNotExit() {
+    void saveIfPersonDoesNotExit() {
         Person person = Person.builder().firstName("John").lastName("Boyd").build();
         when(personDao.addNewPerson(person)).thenReturn(person);
 
@@ -67,5 +67,40 @@ public class PersonServiceImplTest {
         Person person = Person.builder().firstName("Delor").build();
         assertThrows(PersonAlreadyExitException.class, () -> personService.save(person));
         verify(personDao, times(1)).addNewPerson(person);
+    }
+
+    @Test
+    void updateIfPersonExits() {
+        Optional<Person> person = Optional.of(Person.builder().firstName("Delor").lastName("Tatus").zip(345).build());
+
+        when(personDao.update(person.get())).thenReturn(person);
+        personService.update(person.get());
+        person.get().setZip(656);
+        assertEquals(656, person.get().getZip());
+    }
+
+    @Test
+    public void testShouldThrowExceptionWhenThePersonIsNotUpdate() {
+        Person person = Person.builder().firstName("John").lastName("Boyd").build();
+        assertThrows(PersonNotFoundException.class, () -> personService.update(person) );
+        verify(personDao, times(1)).update(person);
+    }
+
+    @Test
+    public void testShouldCheckThatDeleteProvidedPerson() {
+        Person person = Person.builder()
+                .firstName("John")
+                .lastName("pierre")
+                .build();
+        when(personDao.delete(anyString(), anyString())).thenReturn(Optional.of(person));
+
+        personService.delete("John", "pierre");
+        verify(personDao, times(1)).delete(anyString(), anyString());
+    }
+
+    @Test
+    public void testShouldThrowExceptionWhenThePersonIsNotDelete() {
+        assertThrows(PersonNotFoundException.class, () -> personService.delete("joe", "ben") );
+        verify(personDao, times(1)).delete("joe", "ben");
     }
 }
