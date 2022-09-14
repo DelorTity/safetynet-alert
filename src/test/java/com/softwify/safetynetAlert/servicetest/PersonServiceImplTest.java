@@ -69,15 +69,15 @@ public class PersonServiceImplTest {
 
     @Test
     void testShouldVerifyThatReturnUpdatePerson() {
-        Optional<Person> person = Optional.of(Person.builder()
+        Person person = Person.builder()
                 .firstName("John")
                 .lastName("Peppa")
-                .zip(345).build());
+                .zip(345).build();
 
-        when(personDao.update(person.get())).thenReturn(person);
-        Optional<Person> optionalPerson = personService.updatePerson(person.get());
 
-        assertEquals(345, optionalPerson.get().getZip());
+        when(personDao.update(person)).thenReturn(Optional.of(person));
+        Optional<Person> updatePerson = personService.updatePerson(person);
+        assertTrue(updatePerson.isPresent());
     }
 
     @Test
@@ -95,8 +95,11 @@ public class PersonServiceImplTest {
                 .build();
         when(personDao.delete(anyString(), anyString())).thenReturn(Optional.of(person));
 
-        personService.deletePerson("John", "pierre");
-        verify(personDao, times(1)).delete(anyString(), anyString());
+        Optional<Person> deletedPerson = personService.deletePerson("John", "pierre");
+
+        assertTrue(deletedPerson.isPresent());
+        assertEquals("John", deletedPerson.get().getFirstName());
+        verify(personDao, times(1)).delete("John", "pierre");
     }
 
     @Test

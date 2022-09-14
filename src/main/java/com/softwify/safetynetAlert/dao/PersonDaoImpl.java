@@ -60,9 +60,9 @@ public class PersonDaoImpl implements PersonDao {
 
     @Override
     public Optional<Person> delete(String firstname, String lastname) {
-        List<Person> persons = dataStoreManager.getPersons();
         Optional<Person> optionalPerson = findPersonByFirstnameAndLastname(firstname, lastname);
         if (optionalPerson.isPresent()) {
+            List<Person> persons = dataStoreManager.getPersons();
             Person person = optionalPerson.get();
             persons.remove(person);
             return optionalPerson;
