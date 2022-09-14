@@ -6,10 +6,7 @@ import com.softwify.safetynetAlert.model.Person;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -66,7 +63,7 @@ public class PersonDaoImplTest {
     }
 
     @Test
-    public void testShouldVerifyThatWhenSaveCorrect() {
+    public void testShouldVerifyThatPersonSizeAddWhenSaveCorrect() {
         List<Person> arrayPersons = Arrays.asList(
                 Person.builder().firstName("john").lastName("pierre").build(),
                 Person.builder().firstName("jean").lastName("alfred").build()
@@ -75,18 +72,41 @@ public class PersonDaoImplTest {
 
         when(dataStoreManager.getPersons()).thenReturn(persons);
 
-        Person person = Person.builder()
-                .firstName("John")
-                .lastName("Boyd")
-                .address("logpom")
-                .city("douala")
-                .zip(32)
-                .phone("12-43")
-                .email("akl@gmail.com")
-                .build();
+        Person person = Person.builder().build();
 
         personDao.addPerson(person);
 
         assertEquals(3, persons.size());
+    }
+
+    @Test
+    void testUpdateShouldReturnOkIfPersonExitsAndHasBeenUpdated() {
+        Person updatedPerson = Person.builder()
+                .firstName("John")
+                .lastName("Boyd")
+                .zip(123)
+                .build();
+        Optional<Person> person = Optional.of(updatedPerson);
+        when(dataStoreManager.getPersons()).thenReturn(new ArrayList<>(Collections.singleton(updatedPerson)));
+
+        assertTrue(person.isPresent());
+        Optional<Person> update = personDao.update(updatedPerson);
+        assertEquals(123, update.get().getZip());
+
+        verify(dataStoreManager, atLeastOnce()).getPersons();
+    }
+
+    @Test
+    public void getPersonByFirstnTrueWhenPersonNotExist() {
+        List<Person> persons = Arrays.asList(
+                Person.builder().firstName("john").lastName("pierre").build(),
+                Person.builder().firstName("jean").lastName("alfred").build()
+        );
+        Person person = Person.builder().firstName("John").lastName("pierre").build();
+        when(dataStoreManager.getPersons()).thenReturn(persons);
+
+        Optional<Person> update = personDao.update(person);
+
+        verify(dataStoreManager, times(1)).getPersons();
     }
 }

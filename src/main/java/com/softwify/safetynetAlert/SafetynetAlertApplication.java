@@ -9,5 +9,4 @@ public class SafetynetAlertApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SafetynetAlertApplication.class, args);
 	}
-
 }

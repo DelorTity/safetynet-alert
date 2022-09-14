@@ -30,11 +30,29 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public Person savePerson(Person person) {
-        Person personSaved = personDao.addPerson(person);
-        if (personSaved == null) {
+    public Optional<Person> savePerson(Person person) {
+        Optional<Person> optionalPerson = personDao.addPerson(person);
+        if (optionalPerson.isEmpty()) {
             throw new PersonAlreadyExistsException();
         }
-        return personSaved;
+        return optionalPerson;
+    }
+
+    @Override
+    public Optional<Person> updatePerson(Person person) {
+        Optional<Person> update = personDao.update(person);
+        if (update.isEmpty()) {
+            throw new PersonNotFoundException();
+        }
+        return update;
+    }
+
+    @Override
+    public Optional<Person> deletePerson(String firstname, String lastname) {
+        Optional<Person> delete = personDao.delete(firstname, lastname);
+        if (delete.isEmpty()) {
+            throw new PersonNotFoundException();
+        }
+        return delete;
     }
 }

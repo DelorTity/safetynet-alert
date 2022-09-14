@@ -29,17 +29,8 @@ public class PersonDaoImpl implements PersonDao {
         return Optional.empty();
     }
 
- /*   public Optional<Person> checkExistingPerson(String firstName, String lastName) {
-        List<Person> persons = dataStoreManager.getPersons();
-        for (Person person : persons) {
-            if (person.getFirstName() != firstName && person.getLastName() != lastName) {
-                return Optional.of(person);
-            }
-        }
-        return Optional.empty();
-    }*/
     @Override
-    public Person addPerson(Person person) {
+    public Optional<Person> addPerson(Person person) {
         Optional<Person> personOptional = findPersonByFirstnameAndLastname(person.getFirstName(), person.getLastName());
         if (personOptional.isPresent()) {
             return null;
@@ -47,6 +38,35 @@ public class PersonDaoImpl implements PersonDao {
 
         List<Person> persons = dataStoreManager.getPersons();
         persons.add(person);
-        return person;
+        return personOptional;
+    }
+
+    @Override
+    public Optional<Person> update(Person person) {
+        Optional<Person> optionalPerson = findPersonByFirstnameAndLastname(person.getFirstName(), person.getLastName());
+        if (optionalPerson.isPresent()) {
+            Person existingPerson = optionalPerson.get();
+
+            existingPerson.setAddress(person.getAddress());
+            existingPerson.setCity(person.getCity());
+            existingPerson.setPhone(person.getPhone());
+            existingPerson.setEmail(person.getEmail());
+            existingPerson.setZip(person.getZip());
+            return optionalPerson;
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<Person> delete(String firstname, String lastname) {
+        List<Person> persons = dataStoreManager.getPersons();
+        Optional<Person> optionalPerson = findPersonByFirstnameAndLastname(firstname, lastname);
+        if (optionalPerson.isPresent()) {
+            Person person = optionalPerson.get();
+            persons.remove(person);
+            return optionalPerson;
+        }
+        return Optional.empty();
     }
 }

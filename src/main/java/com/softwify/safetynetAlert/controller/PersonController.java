@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/persons")
@@ -34,10 +35,32 @@ public class PersonController {
     @PostMapping
     public ResponseEntity<Person> addPerson(@RequestBody Person person) {
         try {
-            Person createdPerson = personService.savePerson(person);
-            return ResponseEntity.ok(createdPerson);
+            Optional<Person> optionalPerson = personService.savePerson(person);
+            Person addedPerson = optionalPerson.get();
+            return ResponseEntity.ok(addedPerson);
         } catch (PersonAlreadyExistsException e) {
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PutMapping
+    public ResponseEntity<Person> updatePerson(@RequestBody Person person) {
+        try {
+            Optional<Person> optionalPerson = personService.updatePerson(person);
+            Person updatedPerson = optionalPerson.get();
+            return ResponseEntity.ok(updatedPerson);
+        } catch (PersonNotFoundException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @DeleteMapping(value = "/{firstname}/{lastname}")
+    public ResponseEntity<Person> deletePerson(@PathVariable String firstname, @PathVariable String lastname) {
+        try {
+            personService.deletePerson(firstname, lastname);
+            return ResponseEntity.noContent().build();
+        } catch (PersonNotFoundException e) {
+            return ResponseEntity.notFound().build();
         }
     }
 }

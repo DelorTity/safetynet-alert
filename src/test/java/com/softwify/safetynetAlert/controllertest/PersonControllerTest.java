@@ -12,15 +12,18 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest
@@ -81,7 +84,7 @@ public class PersonControllerTest {
 
     @Test
     public void testShouldVerifyThatOkIsReturnWhenSave() throws Exception {
-        Person person = Person.builder()
+        Optional<Person> person = Optional.ofNullable(Person.builder()
                 .firstName("Jack")
                 .lastName("Boyd")
                 .address("douala")
@@ -89,7 +92,7 @@ public class PersonControllerTest {
                 .zip(123)
                 .phone("34-32")
                 .email("anze@gmail.com")
-                .build();
+                .build());
 
         when(personService.savePerson(any())).thenReturn(person);
         String content = new ObjectMapper().writeValueAsString(person);
@@ -142,5 +145,62 @@ public class PersonControllerTest {
                 .andExpect(status().isBadRequest());
 
         verify(personService, times(1)).savePerson(any(Person.class));
+    }
+
+    @Test
+    public void updateReturnIsOKWhenPersonExitsAndHaveBeenModified() throws Exception {
+        Optional<Person> optionalPersonUpdate = Optional.of(Person.builder()
+                .firstName("Jojo")
+                .lastName("Lola")
+                .email("anz@gmail.com")
+                .build());
+        Person personUpdate = optionalPersonUpdate.get();
+
+        when(personService.updatePerson(any(Person.class))).thenReturn(optionalPersonUpdate);
+        assertTrue(optionalPersonUpdate.isPresent());
+
+        String inputJson = new ObjectMapper().writeValueAsString(personUpdate);
+
+        ResultActions result = mockMvc.perform(put("/persons")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(inputJson))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    public void testShouldVerifyReturningStatusWhenNotUpdatePerson() throws Exception {
+        Optional<Person> optionalPersonUpdate = Optional.of(Person.builder().build());
+        when(personService.updatePerson(optionalPersonUpdate.get())).thenThrow(PersonNotFoundException.class);
+
+        MockHttpServletRequestBuilder mockRequest = put("/persons")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON);
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isBadRequest())
+                .andReturn();
+    }
+
+    @Test
+    public void deleteTestShouldReturnNoContentWhendeleteSuccessfully() throws Exception{
+        Optional<Person> person = Optional.of(Person.builder()
+                .firstName("John")
+                .lastName("Boyd")
+                .address("douala")
+                .build());
+        when(personService.deletePerson(anyString(), anyString())).thenReturn(person);
+
+        mockMvc.perform(delete("/persons/John/Boyd"))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+    }
+
+    @Test
+    public void deleteTestShouldReturnNofoundWhenNotdelete() throws Exception{
+        when(personService.deletePerson(anyString(), anyString())).thenThrow(PersonNotFoundException.class);
+
+        mockMvc.perform(delete("/persons/John/Boyd"))
+                .andExpect(status().isNotFound())
+                .andDo(print());
     }
 }

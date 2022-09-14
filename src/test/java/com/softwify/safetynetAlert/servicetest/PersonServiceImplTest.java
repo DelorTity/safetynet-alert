@@ -49,12 +49,13 @@ public class PersonServiceImplTest {
 
     @Test
     public void saveShouldVerifyThatPersonSaveIsReturn() {
-        Person person = Person.builder().firstName("John").lastName("Boyd").build();
-        when(personDao.addPerson(person)).thenReturn(person);
+        Optional<Person> optionalPerson = Optional.ofNullable(Person.builder().firstName("John").lastName("Boyd").build());
+        Person person = optionalPerson.get();
+        when(personDao.addPerson(person)).thenReturn(optionalPerson);
 
-        Person personSave = personService.savePerson(person);
-        assertEquals("John", personSave.getFirstName());
-        assertEquals("Boyd", personSave.getLastName());
+        Optional<Person> savePerson = personService.savePerson(person);
+        assertEquals("John", savePerson.get().getFirstName());
+        assertEquals("Boyd", savePerson.get().getLastName());
 
         verify(personDao, times(1)).addPerson(person);
     }
@@ -65,4 +66,43 @@ public class PersonServiceImplTest {
         assertThrows(PersonAlreadyExistsException.class, () -> personService.savePerson(person) );
         verify(personDao, times(1)).addPerson(person);
     }
+
+    @Test
+    void testShouldVerifyThatReturnUpdatePerson() {
+        Optional<Person> person = Optional.of(Person.builder()
+                .firstName("John")
+                .lastName("Peppa")
+                .zip(345).build());
+
+        when(personDao.update(person.get())).thenReturn(person);
+        Optional<Person> optionalPerson = personService.updatePerson(person.get());
+
+        assertEquals(345, optionalPerson.get().getZip());
+    }
+
+    @Test
+    public void testShouldThrowExceptionWhenThePersonIsNotUpdate() {
+        Person person = Person.builder().firstName("John").lastName("Boyd").build();
+        assertThrows(PersonNotFoundException.class, () -> personService.updatePerson(person) );
+        verify(personDao, times(1)).update(person);
+    }
+
+    @Test
+    public void testShouldCheckThatDeleteProvidedPerson() {
+        Person person = Person.builder()
+                .firstName("John")
+                .lastName("pierre")
+                .build();
+        when(personDao.delete(anyString(), anyString())).thenReturn(Optional.of(person));
+
+        personService.deletePerson("John", "pierre");
+        verify(personDao, times(1)).delete(anyString(), anyString());
+    }
+
+    @Test
+    public void testShouldThrowExceptionWhenThePersonIsNotDelete() {
+        assertThrows(PersonNotFoundException.class, () -> personService.deletePerson("joe", "ben") );
+        verify(personDao, times(1)).delete("joe", "ben");
+    }
+
 }
