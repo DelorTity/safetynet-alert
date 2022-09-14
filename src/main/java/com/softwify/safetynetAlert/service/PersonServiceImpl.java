@@ -36,4 +36,21 @@ public class PersonServiceImpl implements PersonService {
         }
         return addNewPerson;
     }
+    @Override
+    public Optional<Person> update(Person person) {
+        Optional<Person> update = personDao.update(person);
+        if(update.isEmpty()) {
+            throw new PersonNotFoundException();
+        }
+        return update;
+    }
+
+    @Override
+    public Optional<Person> delete(String firstname, String lastname) {
+        Optional<Person> delete = personDao.delete(firstname, lastname);
+        if (delete.isEmpty()) {
+            throw new PersonNotFoundException();
+        }
+        return delete;
+    }
 }
