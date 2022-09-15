@@ -8,5 +8,8 @@ import java.util.Optional;
 public interface FireStationService {
     List<FireStation> getAll();
     Optional<FireStation> addedFireStation(FireStation fireStation);
+    Optional<FireStation> findFireStationByAdresse(String adresse);
+    Optional<FireStation> updateFireStation(FireStation fireStation);
+    Optional<FireStation> deleteFireStation(String adresse);
 
 }

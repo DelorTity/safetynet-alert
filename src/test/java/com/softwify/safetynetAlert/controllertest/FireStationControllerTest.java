@@ -1,6 +1,9 @@
 package com.softwify.safetynetAlert.controllertest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.softwify.safetynetAlert.controller.FireStationController;
+import com.softwify.safetynetAlert.exceptions.FireStationNotFoundException;
+import com.softwify.safetynetAlert.exceptions.PersonNotFoundException;
 import com.softwify.safetynetAlert.model.FireStation;
 import com.softwify.safetynetAlert.service.FireStationService;
 import org.junit.jupiter.api.Test;
@@ -17,12 +20,12 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest
+@WebMvcTest(controllers = {FireStationController.class})
 public class FireStationControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -38,7 +41,7 @@ public class FireStationControllerTest {
         );
         when(fireStationServie.getAll()).thenReturn(fireStations);
 
-        MvcResult result = mockMvc.perform(get("/firestation"))
+        MvcResult result = mockMvc.perform(get("/firestations"))
                 .andExpect(status().isOk())
                 .andReturn();
         String contentAsString = result.getResponse().getContentAsString();
@@ -58,7 +61,7 @@ public class FireStationControllerTest {
 
         when(fireStationServie.addedFireStation(any())).thenReturn(optionalFireStation);
         String content = new ObjectMapper().writeValueAsString(fireStation);
-        MockHttpServletRequestBuilder mockRequest = post("/firestation")
+        MockHttpServletRequestBuilder mockRequest = post("/firestations")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(content);
@@ -67,5 +70,79 @@ public class FireStationControllerTest {
                 .andReturn();
 
         verify(fireStationServie, times(1)).addedFireStation(any());
+    }
+
+    @Test
+    public void testShouldVerifyThatStatusIsOkAndReturnTheFireStation() throws Exception {
+        FireStation fireStation = FireStation.builder()
+                .address("12 doul")
+                .build();
+        when(fireStationServie.findFireStationByAdresse("12 doul")).thenReturn(Optional.of(fireStation));
+
+        String url = "/firestations/12 doul";
+        MvcResult result = mockMvc.perform(get(url))
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = result.getResponse().getContentAsString();
+        FireStation firestationRetrieved = new ObjectMapper().readValue(contentAsString, FireStation.class);
+
+        assertEquals("12 doul", firestationRetrieved.getAddress());
+        verify(fireStationServie, times(1)).findFireStationByAdresse("12 doul");
+    }
+
+    @Test
+    public void updateReturnIsOKWhenPersonExitsAndHaveBeenModified() throws Exception {
+        FireStation fireStation = FireStation.builder()
+                .address("143 pk14 sr")
+                .station(54)
+                .build();
+
+        Optional<FireStation> optionalFireStation = Optional.of(fireStation);
+
+        when(fireStationServie.updateFireStation(any(FireStation.class))).thenReturn(optionalFireStation);
+        assertTrue(optionalFireStation.isPresent());
+
+        String inputJson = new ObjectMapper().writeValueAsString(fireStation);
+        mockMvc.perform(put("/firestations")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(inputJson))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testShouldVerifyReturningBadStatusWhenNotUpdateFireStation() throws Exception {
+        FireStation fireStation = FireStation.builder()
+                .address("143 pk14 sr")
+                .station(54)
+                .build();
+
+        when(fireStationServie.updateFireStation(fireStation)).thenThrow(FireStationNotFoundException.class);
+
+        MockHttpServletRequestBuilder mockRequest = put("/firestations")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON);
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isBadRequest())
+                .andReturn();
+    }
+
+    @Test
+    public void deleteTestShouldReturnNoContentWhendeleteSuccessfully() throws Exception {
+        FireStation fireStation = FireStation.builder()
+                .address("143 pk14 sr")
+                .station(54)
+                .build();
+        when(fireStationServie.deleteFireStation("143 pk14 sr")).thenReturn(Optional.of(fireStation));
+
+        mockMvc.perform(delete("/firestations/143 pk14 sr"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void deleteTestShouldReturnNofoundWhenNotdelete() throws Exception {
+        when(fireStationServie.deleteFireStation(anyString())).thenThrow(PersonNotFoundException.class);
+
+        mockMvc.perform(delete("/firestations/143 pk14 sr"))
+                .andExpect(status().isNotFound());
     }
 }

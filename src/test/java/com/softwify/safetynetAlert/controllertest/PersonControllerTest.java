@@ -1,6 +1,7 @@
 package com.softwify.safetynetAlert.controllertest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.softwify.safetynetAlert.controller.PersonController;
 import com.softwify.safetynetAlert.exceptions.PersonAlreadyExistsException;
 import com.softwify.safetynetAlert.exceptions.PersonNotFoundException;
 import com.softwify.safetynetAlert.model.Person;
@@ -12,7 +13,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import java.util.Arrays;
@@ -23,10 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest
+@WebMvcTest(controllers = {PersonController.class})
 public class PersonControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -161,11 +160,10 @@ public class PersonControllerTest {
 
         String inputJson = new ObjectMapper().writeValueAsString(personUpdate);
 
-        ResultActions result = mockMvc.perform(put("/persons")
+        mockMvc.perform(put("/persons")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(inputJson))
-                .andExpect(status().isOk())
-                .andDo(print());
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -182,7 +180,7 @@ public class PersonControllerTest {
     }
 
     @Test
-    public void deleteTestShouldReturnNoContentWhendeleteSuccessfully() throws Exception{
+    public void deleteTestShouldReturnNoContentWhendeleteSuccessfully() throws Exception {
         Optional<Person> optionalPerson = Optional.of(Person.builder()
                 .firstName("John")
                 .lastName("Boyd")
@@ -195,7 +193,7 @@ public class PersonControllerTest {
     }
 
     @Test
-    public void deleteTestShouldReturnNofoundWhenNotdelete() throws Exception{
+    public void deleteTestShouldReturnNofoundWhenNotdelete() throws Exception {
         when(personService.deletePerson(anyString(), anyString())).thenThrow(PersonNotFoundException.class);
 
         mockMvc.perform(delete("/persons/John/Boyd"))

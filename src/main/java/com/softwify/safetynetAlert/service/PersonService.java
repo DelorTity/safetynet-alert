@@ -11,5 +11,4 @@ public interface PersonService {
     Optional<Person> savePerson(Person person);
     Optional<Person> updatePerson(Person person);
     Optional<Person> deletePerson(String firstname, String lastname);
-
 }
