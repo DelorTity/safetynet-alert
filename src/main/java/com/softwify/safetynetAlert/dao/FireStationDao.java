@@ -1,4 +1,12 @@
 package com.softwify.safetynetAlert.dao;
 
-public class FireStationDao {
+import com.softwify.safetynetAlert.model.FireStation;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface FireStationDao {
+    List<FireStation> findAll();
+    Optional<FireStation> addFireStation(FireStation fireStation);
+
 }

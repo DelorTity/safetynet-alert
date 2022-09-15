@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-@RestController
+//@RestController
 @RequestMapping(value = "/persons")
 public class PersonController {
     @Autowired
@@ -24,12 +24,12 @@ public class PersonController {
 
     @GetMapping(value = "/{firstname}/{lastname}")
     public ResponseEntity<Person> retrievedPerson(@PathVariable String firstname, @PathVariable String lastname) {
-       try {
-           Person person = personService.findByFirstnameLastname(firstname, lastname);
-           return ResponseEntity.ok(person);
-       } catch (PersonNotFoundException e) {
-           return ResponseEntity.notFound().build();
-       }
+        try {
+            Person person = personService.findByFirstnameLastname(firstname, lastname);
+            return ResponseEntity.ok(person);
+        } catch (PersonNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping

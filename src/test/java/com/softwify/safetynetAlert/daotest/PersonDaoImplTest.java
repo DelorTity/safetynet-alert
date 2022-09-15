@@ -73,8 +73,7 @@ public class PersonDaoImplTest {
         when(dataStoreManager.getPersons()).thenReturn(persons);
 
         Person person = Person.builder().build();
-
-        personDao.addPerson(person);
+        Optional<Person> optionalPerson = personDao.addPerson(person);
 
         assertEquals(3, persons.size());
     }
@@ -149,5 +148,4 @@ public class PersonDaoImplTest {
         assertTrue(update.isEmpty());
         verify(dataStoreManager, atLeastOnce()).getPersons();
     }
-
 }
