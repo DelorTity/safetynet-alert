@@ -5,6 +5,7 @@ import com.softwify.safetynetAlert.model.Person;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,4 +31,19 @@ class FireStationsDaoImplTest {
         verify(dataStoreManager, times(1)).getFireStation();
     }
 
+
+    @Test
+    public void testShouldVerifyThatFireStationSizeAddWhenSaveCorrect() {
+        List<FireStation> fireStationsArrays = Arrays.asList(
+                FireStation.builder().address("12-buea-BR").build(),
+                FireStation.builder().address("129-Yaounde-DR").build()
+        );
+        List<FireStation> fireStations = new ArrayList<>(fireStationsArrays);
+
+        when(dataStoreManager.getFireStation()).thenReturn(fireStations);
+        FireStation fireStation = FireStation.builder().build();
+        fireStationsDao.save(fireStation);
+
+        assertEquals(3, fireStations.size());
+    }
 }

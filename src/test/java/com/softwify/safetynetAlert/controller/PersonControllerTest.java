@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest
+    @WebMvcTest
 public class PersonControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -156,16 +156,16 @@ public class PersonControllerTest {
 
     @Test
     public void deleteTestShouldReturnNoContentWhenDeleteSuccessfully() throws Exception{
-        Person person = Person.builder()
+        Optional<Person> person = Optional.of(Person.builder()
                 .firstName("John")
                 .lastName("Boyd")
                 .address("douala")
-                .build();
-        Optional<Person> optionalPerson = Optional.of(person);
-        when(personService.delete("John", "Boyd")).thenReturn(optionalPerson);
+                .build());
+        when(personService.delete(anyString(), anyString())).thenReturn(person);
 
         mockMvc.perform(delete("/persons/John/Boyd"))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent())
+                .andDo(print());
     }
 
     @Test
@@ -175,7 +175,5 @@ public class PersonControllerTest {
         mockMvc.perform(delete("/persons/John/Boyd"))
                 .andExpect(status().isNotFound())
                 .andDo(print());
-                .andExpect(status().isNotFound());
-
     }
-}
+    }
