@@ -31,7 +31,7 @@ public class FireStationControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private FireStationService fireStationServie;
+    private FireStationService fireStationService;
 
     @Test
     public void testShouldVerifyThatControllerReturnOkStatusAndPerssonLengthIsCorrect() throws Exception {
@@ -39,7 +39,7 @@ public class FireStationControllerTest {
                 FireStation.builder().address("1509 Culver St").station(2).build(),
                 FireStation.builder().address("12-dla-M").station(3).build()
         );
-        when(fireStationServie.getAll()).thenReturn(fireStations);
+        when(fireStationService.getAll()).thenReturn(fireStations);
 
         MvcResult result = mockMvc.perform(get("/firestations"))
                 .andExpect(status().isOk())
@@ -48,7 +48,7 @@ public class FireStationControllerTest {
         FireStation[] fireStationRetrieved = new ObjectMapper().readValue(contentAsString, FireStation[].class);
 
         assertEquals(2, fireStationRetrieved.length);
-        verify(fireStationServie, times(1)).getAll();
+        verify(fireStationService, times(1)).getAll();
     }
 
     @Test
@@ -59,7 +59,7 @@ public class FireStationControllerTest {
 
         Optional<FireStation> optionalFireStation = Optional.of(fireStation);
 
-        when(fireStationServie.addedFireStation(any())).thenReturn(optionalFireStation);
+        when(fireStationService.addedFireStation(any())).thenReturn(optionalFireStation);
         String content = new ObjectMapper().writeValueAsString(fireStation);
         MockHttpServletRequestBuilder mockRequest = post("/firestations")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -69,7 +69,7 @@ public class FireStationControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        verify(fireStationServie, times(1)).addedFireStation(any());
+        verify(fireStationService, times(1)).addedFireStation(any());
     }
 
     @Test
@@ -78,7 +78,7 @@ public class FireStationControllerTest {
                 .address("12-doul")
                 .build();
 
-        when(fireStationServie.addedFireStation(any())).thenThrow(FireStationAlreadyExistException.class);
+        when(fireStationService.addedFireStation(any())).thenThrow(FireStationAlreadyExistException.class);
         String content = new ObjectMapper().writeValueAsString(fireStation);
         MockHttpServletRequestBuilder mockRequest = post("/firestations")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -88,7 +88,7 @@ public class FireStationControllerTest {
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
-        verify(fireStationServie, times(1)).addedFireStation(any());
+        verify(fireStationService, times(1)).addedFireStation(any());
     }
 
     @Test
@@ -96,7 +96,7 @@ public class FireStationControllerTest {
         FireStation fireStation = FireStation.builder()
                 .address("12 doul")
                 .build();
-        when(fireStationServie.findFireStationByAddress("12 doul")).thenReturn(Optional.of(fireStation));
+        when(fireStationService.findFireStationByAddress("12 doul")).thenReturn(Optional.of(fireStation));
 
         String url = "/firestations/12 doul";
         MvcResult result = mockMvc.perform(get(url))
@@ -106,7 +106,7 @@ public class FireStationControllerTest {
         FireStation firestationRetrieved = new ObjectMapper().readValue(contentAsString, FireStation.class);
 
         assertEquals("12 doul", firestationRetrieved.getAddress());
-        verify(fireStationServie, times(1)).findFireStationByAddress("12 doul");
+        verify(fireStationService, times(1)).findFireStationByAddress("12 doul");
     }
 
     @Test
@@ -118,7 +118,7 @@ public class FireStationControllerTest {
 
         Optional<FireStation> optionalFireStation = Optional.of(fireStation);
 
-        when(fireStationServie.updateFireStation(any(FireStation.class))).thenReturn(optionalFireStation);
+        when(fireStationService.updateFireStation(any(FireStation.class))).thenReturn(optionalFireStation);
         assertTrue(optionalFireStation.isPresent());
 
         String inputJson = new ObjectMapper().writeValueAsString(fireStation);
@@ -135,7 +135,7 @@ public class FireStationControllerTest {
                 .station(54)
                 .build();
 
-        when(fireStationServie.updateFireStation(fireStation)).thenThrow(FireStationNotFoundException.class);
+        when(fireStationService.updateFireStation(fireStation)).thenThrow(FireStationNotFoundException.class);
 
         MockHttpServletRequestBuilder mockRequest = put("/firestations")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -151,7 +151,7 @@ public class FireStationControllerTest {
                 .address("143 pk14 sr")
                 .station(54)
                 .build();
-        when(fireStationServie.deleteFireStation("143 pk14 sr")).thenReturn(Optional.of(fireStation));
+        when(fireStationService.deleteFireStation("143 pk14 sr")).thenReturn(Optional.of(fireStation));
 
         mockMvc.perform(delete("/firestations/143 pk14 sr"))
                 .andExpect(status().isNoContent());
@@ -159,7 +159,7 @@ public class FireStationControllerTest {
 
     @Test
     public void deleteTestShouldReturnNofoundWhenNotdelete() throws Exception {
-        when(fireStationServie.deleteFireStation(anyString())).thenThrow(PersonNotFoundException.class);
+        when(fireStationService.deleteFireStation(anyString())).thenThrow(PersonNotFoundException.class);
 
         mockMvc.perform(delete("/firestations/143 pk14 sr"))
                 .andExpect(status().isNotFound());
