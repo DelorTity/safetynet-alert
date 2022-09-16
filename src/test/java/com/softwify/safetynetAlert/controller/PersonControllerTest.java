@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-    @WebMvcTest
+@WebMvcTest
 public class PersonControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -176,4 +176,4 @@ public class PersonControllerTest {
                 .andExpect(status().isNotFound())
                 .andDo(print());
     }
-    }
+}
