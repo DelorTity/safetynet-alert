@@ -173,6 +173,9 @@ public class PersonControllerTest {
         when(personService.delete(anyString(), anyString())).thenThrow(PersonNotFoundException.class);
 
         mockMvc.perform(delete("/persons/John/Boyd"))
+                .andExpect(status().isNotFound())
+                .andDo(print());
                 .andExpect(status().isNotFound());
+
     }
 }
