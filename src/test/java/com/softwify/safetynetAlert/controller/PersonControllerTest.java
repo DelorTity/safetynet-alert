@@ -156,16 +156,16 @@ public class PersonControllerTest {
 
     @Test
     public void deleteTestShouldReturnNoContentWhenDeleteSuccessfully() throws Exception{
-        Optional<Person> person = Optional.of(Person.builder()
+        Person person = Person.builder()
                 .firstName("John")
                 .lastName("Boyd")
                 .address("douala")
-                .build());
-        when(personService.delete(anyString(), anyString())).thenReturn(person);
+                .build();
+        Optional<Person> optionalPerson = Optional.of(person);
+        when(personService.delete("John", "Boyd")).thenReturn(optionalPerson);
 
         mockMvc.perform(delete("/persons/John/Boyd"))
-                .andExpect(status().isNoContent())
-                .andDo(print());
+                .andExpect(status().isNoContent());
     }
 
     @Test
@@ -175,5 +175,7 @@ public class PersonControllerTest {
         mockMvc.perform(delete("/persons/John/Boyd"))
                 .andExpect(status().isNotFound())
                 .andDo(print());
+                .andExpect(status().isNotFound());
+
     }
 }
