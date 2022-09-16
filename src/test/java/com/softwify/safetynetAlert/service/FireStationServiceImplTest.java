@@ -1,9 +1,9 @@
-package com.softwify.safetynetAlert.servicetest;
+package com.softwify.safetynetAlert.service;
 
 import com.softwify.safetynetAlert.dao.FireStationDao;
+import com.softwify.safetynetAlert.exceptions.FireStationAlreadyExistException;
 import com.softwify.safetynetAlert.exceptions.FireStationNotFoundException;
 import com.softwify.safetynetAlert.model.FireStation;
-import com.softwify.safetynetAlert.service.FireStationServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -35,23 +35,30 @@ public class FireStationServiceImplTest {
     }
 
     @Test
+    public void saveShouldThrowExceptionWhenTheFireStationIsNotSave() {
+        FireStation fireStation = FireStation.builder().station(3).build();
+        assertThrows(FireStationAlreadyExistException.class, () -> fireStationService.addedFireStation(fireStation) );
+        verify(fireStationDao, times(1)).save(fireStation);
+    }
+
+    @Test
     public void getFireStationByAdressShouldReturnTheInformations() {
         FireStation fireStation = FireStation.builder().address("12 tokyo dr").station(3).build();
         Optional<FireStation> optionalPerson = Optional.of(fireStation);
-        when(fireStationDao.findFireStationByAdresse("12 tokyo dr")).thenReturn(optionalPerson);
+        when(fireStationDao.findFireStationByAddress("12 tokyo dr")).thenReturn(optionalPerson);
 
-        Optional<FireStation> firestationRetrieved = fireStationService.findFireStationByAdresse("12 tokyo dr");
+        Optional<FireStation> firestationRetrieved = fireStationService.findFireStationByAddress("12 tokyo dr");
         assertNotNull(firestationRetrieved);
         assertEquals("12 tokyo dr", firestationRetrieved.get().getAddress());
         assertEquals(3, firestationRetrieved.get().getStation());
 
-        verify(fireStationDao, times(1)).findFireStationByAdresse("12 tokyo dr");
+        verify(fireStationDao, times(1)).findFireStationByAddress("12 tokyo dr");
     }
 
     @Test
     public void getFireStationByAdressShouldThrowExceptionWhenThereIsNoPerson() {
-        assertThrows(FireStationNotFoundException.class, () -> fireStationService.findFireStationByAdresse("12 tokyo dr"));
-        verify(fireStationDao, times(1)).findFireStationByAdresse("12 tokyo dr");
+        assertThrows(FireStationNotFoundException.class, () -> fireStationService.findFireStationByAddress("12 tokyo dr"));
+        verify(fireStationDao, times(1)).findFireStationByAddress("12 tokyo dr");
     }
 
     @Test

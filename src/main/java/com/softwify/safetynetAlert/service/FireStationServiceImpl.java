@@ -2,6 +2,7 @@ package com.softwify.safetynetAlert.service;
 
 import com.softwify.safetynetAlert.dao.FireStationDao;
 import com.softwify.safetynetAlert.exceptions.FireStationNotFoundException;
+import com.softwify.safetynetAlert.exceptions.FireStationAlreadyExistException;
 import com.softwify.safetynetAlert.model.FireStation;
 import org.springframework.stereotype.Service;
 
@@ -22,15 +23,18 @@ public class FireStationServiceImpl implements FireStationService{
     }
 
     @Override
-    public Optional<FireStation> addedFireStation(FireStation fireStation) {
-        Optional<FireStation> firestationSave = fireStationDao.save(fireStation);
-        return firestationSave;
+    public Optional<FireStation> findFireStationByAddress(String address) {
+        Optional<FireStation> optionalFireStation = fireStationDao.findFireStationByAddress(address);
+        return Optional.of(optionalFireStation.orElseThrow(FireStationNotFoundException::new));
     }
 
     @Override
-    public Optional<FireStation> findFireStationByAdresse(String adresse) {
-        Optional<FireStation> optionalFireStation = fireStationDao.findFireStationByAdresse(adresse);
-        return Optional.of(optionalFireStation.orElseThrow(FireStationNotFoundException::new));
+    public Optional<FireStation> addedFireStation(FireStation fireStation) {
+        Optional<FireStation> firestationSave = fireStationDao.save(fireStation);
+        if (firestationSave.isEmpty()) {
+            throw new FireStationAlreadyExistException();
+        }
+        return firestationSave;
     }
 
     @Override

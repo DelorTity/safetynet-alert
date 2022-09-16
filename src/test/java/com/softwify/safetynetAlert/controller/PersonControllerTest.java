@@ -1,7 +1,6 @@
-package com.softwify.safetynetAlert.controllertest;
+package com.softwify.safetynetAlert.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.softwify.safetynetAlert.controller.PersonController;
 import com.softwify.safetynetAlert.exceptions.PersonAlreadyExistsException;
 import com.softwify.safetynetAlert.exceptions.PersonNotFoundException;
 import com.softwify.safetynetAlert.model.Person;

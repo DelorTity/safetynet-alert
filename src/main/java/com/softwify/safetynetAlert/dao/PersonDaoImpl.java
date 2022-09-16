@@ -33,12 +33,12 @@ public class PersonDaoImpl implements PersonDao {
     public Optional<Person> addPerson(Person person) {
         Optional<Person> personOptional = findPersonByFirstnameAndLastname(person.getFirstName(), person.getLastName());
         if (personOptional.isPresent()) {
-            return null;
+            return Optional.empty();
         }
 
         List<Person> persons = dataStoreManager.getPersons();
         persons.add(person);
-        return personOptional;
+        return Optional.of(person);
     }
 
     @Override

@@ -1,7 +1,5 @@
-package com.softwify.safetynetAlert.daotest;
+package com.softwify.safetynetAlert.dao;
 
-import com.softwify.safetynetAlert.dao.DataStoreManager;
-import com.softwify.safetynetAlert.dao.FireStationDaoImpl;
 import com.softwify.safetynetAlert.model.FireStation;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -46,6 +44,20 @@ public class FireStationDaoImplTest {
         assertEquals(3, fireStations.size());
     }
 
+
+    @Test
+    public void testShouldReturnEmptyWhenNotSavingFireStation() {
+        List<FireStation> fireStationsArrays = Arrays.asList(
+                FireStation.builder().address("12-limbe-DR").build(),
+                FireStation.builder().address("129-Douala-DR").build()
+        );
+        when(dataStoreManager.getFireStation()).thenReturn(fireStationsArrays);
+
+        Optional<FireStation> save = fireStationDao.save(fireStationsArrays.get(0));
+
+        assertTrue(save.isEmpty());
+    }
+
     @Test
     public void getFireStationByAdressShouldReturnFalseWhenFireStationNotExist() {
         List<FireStation> fireStations = Arrays.asList(
@@ -54,7 +66,7 @@ public class FireStationDaoImplTest {
         );
         when(dataStoreManager.getFireStation()).thenReturn(fireStations);
 
-        Optional<FireStation> fireStationByAdresse = fireStationDao.findFireStationByAdresse("tokyo dr");
+        Optional<FireStation> fireStationByAdresse = fireStationDao.findFireStationByAddress("tokyo dr");
         assertFalse(fireStationByAdresse.isPresent());
 
         verify(dataStoreManager, times(1)).getFireStation();
@@ -68,7 +80,7 @@ public class FireStationDaoImplTest {
         );
         when(dataStoreManager.getFireStation()).thenReturn(fireStations);
 
-        Optional<FireStation> optionalFireStation = fireStationDao.findFireStationByAdresse("12 tokyo dr");
+        Optional<FireStation> optionalFireStation = fireStationDao.findFireStationByAddress("12 tokyo dr");
 
         assertTrue(optionalFireStation.isPresent());
         assertEquals(3, optionalFireStation.get().getStation());

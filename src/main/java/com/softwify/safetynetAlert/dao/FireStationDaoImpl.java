@@ -21,20 +21,10 @@ public class FireStationDaoImpl implements FireStationDao{
     }
 
     @Override
-    public Optional<FireStation> save(FireStation fireStation) {
-        List<FireStation> fireStations = dataStoreManager.getFireStation();
-        boolean add = fireStations.add(fireStation);
-        if (add) {
-            return Optional.of(fireStation);
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<FireStation> findFireStationByAdresse(String adresse) {
+    public Optional<FireStation> findFireStationByAddress(String address) {
         List<FireStation> fireStations = dataStoreManager.getFireStation();
         for (FireStation fireStation : fireStations) {
-            if (fireStation.getAddress().equals(adresse)) {
+            if (fireStation.getAddress().equals(address)) {
                 return Optional.of(fireStation);
             }
         }
@@ -42,8 +32,20 @@ public class FireStationDaoImpl implements FireStationDao{
     }
 
     @Override
+    public Optional<FireStation> save(FireStation fireStation) {
+        Optional<FireStation> optionalFireStation = findFireStationByAddress(fireStation.getAddress());
+
+        if (optionalFireStation.isEmpty()) {
+            List<FireStation> fireStations = dataStoreManager.getFireStation();
+            fireStations.add(fireStation);
+            return Optional.of(fireStation);
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public Optional<FireStation> update(FireStation fireStation) {
-        Optional<FireStation> optionalFireStation = findFireStationByAdresse(fireStation.getAddress());
+        Optional<FireStation> optionalFireStation = findFireStationByAddress(fireStation.getAddress());
         if (optionalFireStation.isPresent()) {
             FireStation existingFireStation = optionalFireStation.get();
             existingFireStation.setAddress(fireStation.getAddress());
@@ -55,7 +57,7 @@ public class FireStationDaoImpl implements FireStationDao{
 
     @Override
     public Optional<FireStation> delete(String adresse) {
-        Optional<FireStation> optionalFireStation = findFireStationByAdresse(adresse);
+        Optional<FireStation> optionalFireStation = findFireStationByAddress(adresse);
         if (optionalFireStation.isPresent()) {
             List<FireStation> fireStations = dataStoreManager.getFireStation();
             FireStation fireStation = optionalFireStation.get();

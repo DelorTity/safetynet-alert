@@ -36,8 +36,7 @@ public class PersonController {
     public ResponseEntity<Person> addPerson(@RequestBody Person person) {
         try {
             Optional<Person> optionalPerson = personService.savePerson(person);
-            Person addedPerson = optionalPerson.get();
-            return ResponseEntity.ok(addedPerson);
+            return ResponseEntity.ok(optionalPerson.get());
         } catch (PersonAlreadyExistsException e) {
             return ResponseEntity.badRequest().build();
         }

@@ -1,10 +1,9 @@
-package com.softwify.safetynetAlert.servicetest;
+package com.softwify.safetynetAlert.service;
 
 import com.softwify.safetynetAlert.dao.PersonDao;
 import com.softwify.safetynetAlert.exceptions.PersonAlreadyExistsException;
 import com.softwify.safetynetAlert.exceptions.PersonNotFoundException;
 import com.softwify.safetynetAlert.model.Person;
-import com.softwify.safetynetAlert.service.PersonServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 

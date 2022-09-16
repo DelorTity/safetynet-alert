@@ -1,7 +1,7 @@
-package com.softwify.safetynetAlert.controllertest;
+package com.softwify.safetynetAlert.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.softwify.safetynetAlert.controller.FireStationController;
+import com.softwify.safetynetAlert.exceptions.FireStationAlreadyExistException;
 import com.softwify.safetynetAlert.exceptions.FireStationNotFoundException;
 import com.softwify.safetynetAlert.exceptions.PersonNotFoundException;
 import com.softwify.safetynetAlert.model.FireStation;
@@ -73,11 +73,30 @@ public class FireStationControllerTest {
     }
 
     @Test
+    public void testShdVerifyThatBadStatusReturnWhenNotSave() throws Exception {
+        FireStation fireStation = FireStation.builder()
+                .address("12-doul")
+                .build();
+
+        when(fireStationServie.addedFireStation(any())).thenThrow(FireStationAlreadyExistException.class);
+        String content = new ObjectMapper().writeValueAsString(fireStation);
+        MockHttpServletRequestBuilder mockRequest = post("/firestations")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(content);
+        MvcResult result = mockMvc.perform(mockRequest)
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        verify(fireStationServie, times(1)).addedFireStation(any());
+    }
+
+    @Test
     public void testShouldVerifyThatStatusIsOkAndReturnTheFireStation() throws Exception {
         FireStation fireStation = FireStation.builder()
                 .address("12 doul")
                 .build();
-        when(fireStationServie.findFireStationByAdresse("12 doul")).thenReturn(Optional.of(fireStation));
+        when(fireStationServie.findFireStationByAddress("12 doul")).thenReturn(Optional.of(fireStation));
 
         String url = "/firestations/12 doul";
         MvcResult result = mockMvc.perform(get(url))
@@ -87,7 +106,7 @@ public class FireStationControllerTest {
         FireStation firestationRetrieved = new ObjectMapper().readValue(contentAsString, FireStation.class);
 
         assertEquals("12 doul", firestationRetrieved.getAddress());
-        verify(fireStationServie, times(1)).findFireStationByAdresse("12 doul");
+        verify(fireStationServie, times(1)).findFireStationByAddress("12 doul");
     }
 
     @Test

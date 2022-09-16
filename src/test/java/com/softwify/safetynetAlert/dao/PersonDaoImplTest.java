@@ -1,7 +1,5 @@
-package com.softwify.safetynetAlert.daotest;
+package com.softwify.safetynetAlert.dao;
 
-import com.softwify.safetynetAlert.dao.DataStoreManager;
-import com.softwify.safetynetAlert.dao.PersonDaoImpl;
 import com.softwify.safetynetAlert.model.Person;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -79,7 +77,22 @@ public class PersonDaoImplTest {
     }
 
     @Test
-    void testUpdateShouldReturnOkIfPersonExitsAndHasBeenUpdated() {
+    public void testShouldReturnEmptyWhenNotSavingPerson() {
+        List<Person> arrayPersons = Arrays.asList(
+                Person.builder().firstName("john").lastName("pierre").build(),
+                Person.builder().firstName("jean").lastName("alfred").build()
+        );
+        when(dataStoreManager.getPersons()).thenReturn(arrayPersons);
+
+        Person person = Person.builder().firstName("john").lastName("pierre").build();
+
+        Optional<Person> save = personDao.addPerson(person);
+
+        assertTrue(save.isEmpty());
+    }
+
+    @Test
+    void testShouldReturnUpdatedPerson() {
         Person updatedPerson = Person.builder()
                 .firstName("John")
                 .lastName("Boyd")

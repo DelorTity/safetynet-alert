@@ -1,5 +1,6 @@
 package com.softwify.safetynetAlert.controller;
 
+import com.softwify.safetynetAlert.exceptions.FireStationAlreadyExistException;
 import com.softwify.safetynetAlert.exceptions.FireStationNotFoundException;
 import com.softwify.safetynetAlert.exceptions.PersonNotFoundException;
 import com.softwify.safetynetAlert.model.FireStation;
@@ -23,21 +24,25 @@ public class FireStationController {
         return fireStationService.getAll();
     }
 
-    @PostMapping
-    public ResponseEntity<FireStation> addFirestation(@RequestBody FireStation fireStation) {
-        Optional<FireStation> optionalFireStation = fireStationService.addedFireStation(fireStation);
-        FireStation addedFireStation = optionalFireStation.get();
-        return ResponseEntity.ok(addedFireStation);
-    }
-
     @GetMapping(value = "/{adresse}")
     public ResponseEntity<FireStation> retrievedFireStation(@PathVariable String adresse) {
         try {
-            Optional<FireStation> optionalFireStation = fireStationService.findFireStationByAdresse(adresse);
+            Optional<FireStation> optionalFireStation = fireStationService.findFireStationByAddress(adresse);
             FireStation fireStation = optionalFireStation.get();
             return ResponseEntity.ok(fireStation);
         } catch (PersonNotFoundException e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping
+    public ResponseEntity<FireStation> addFirestation(@RequestBody FireStation fireStation) {
+        try {
+            Optional<FireStation> optionalFireStation = fireStationService.addedFireStation(fireStation);
+            FireStation save = optionalFireStation.get();
+            return ResponseEntity.ok(save);
+        } catch (FireStationAlreadyExistException e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 
