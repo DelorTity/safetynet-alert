@@ -13,7 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,10 +22,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest
+@WebMvcTest(controllers = {PersonController.class})
 public class PersonControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -37,8 +35,8 @@ public class PersonControllerTest {
     @Test
     public void testShouldVerifyThatControllerReturnOkStatusAndPerssonLengthIsCorrect() throws Exception {
         List<Person> persons = Arrays.asList(
-                Person.builder().firstName("Yvan").build(),
-                Person.builder().firstName("Pierre").build()
+                Person.builder().build(),
+                Person.builder().firstName("jean").build()
         );
         when(personService.findAll()).thenReturn(persons);
 
@@ -49,8 +47,27 @@ public class PersonControllerTest {
         Person[] personsRetrieved = new ObjectMapper().readValue(contentAsString, Person[].class);
 
         assertEquals(2, personsRetrieved.length);
+        verify(personService, times(1)).findAll();
     }
 
+    @Test
+    public void testShouldVerifyThatStatusIsOkAndReturnThePerson() throws Exception {
+        Person person = Person.builder()
+                .firstName("John")
+                .lastName("Boyd")
+                .build();
+        when(personService.findByFirstnameLastname("John", "Boyd")).thenReturn(person);
+
+        String url = "/persons/John/Boyd";
+        MvcResult result = mockMvc.perform(get(url))
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = result.getResponse().getContentAsString();
+        Person personRetrieved = new ObjectMapper().readValue(contentAsString, Person.class);
+
+        assertEquals("John", personRetrieved.getFirstName());
+        verify(personService, times(1)).findByFirstnameLastname("John", "Boyd");
+    }
 
     @Test
     public void testShouldVerifyReturningExceptionWhenThereIsNoPerson() throws Exception {
@@ -64,46 +81,37 @@ public class PersonControllerTest {
     }
 
     @Test
-    void saveIfPersonDoNotExit() throws Exception {
-        Person person = Person.builder()
-                .firstName("Delor")
-                .lastName("Tity")
-                .build();
+    public void testShouldVerifyThatOkIsReturnWhenSave() throws Exception {
+        Optional<Person> person = Optional.ofNullable(Person.builder()
+                .firstName("Jack")
+                .lastName("Boyd")
+                .address("douala")
+                .city("limbe")
+                .zip(123)
+                .phone("34-32")
+                .email("anze@gmail.com")
+                .build());
 
-        when(personService.save(person)).thenReturn(person);
-
+        when(personService.save(any())).thenReturn(person.get());
         String content = new ObjectMapper().writeValueAsString(person);
-        this.mockMvc
-                .perform(post("/persons")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(content))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-
-        assertEquals("Delor", person.getFirstName());
-        assertEquals("Tity", person.getLastName());
-    }
-
-    @Test
-    public void savePersonReturnBadRequestWhenPersonExit() throws Exception {
-        Person person = Person.builder()
-                .firstName("Delor")
-                .lastName("Tity")
-                .build();
-        when(personService.save(any(Person.class))).thenThrow(PersonAlreadyExitException.class);
-
-        String content = new ObjectMapper().writeValueAsString(person);
-        mockMvc
-                .perform(post("/persons")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(content))
-                .andExpect(status().isBadRequest())
+        MockHttpServletRequestBuilder mockRequest = post("/persons")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(content);
+        MvcResult result = mockMvc.perform(mockRequest)
+                .andExpect(status().isOk())
                 .andReturn();
 
+        String contentAsString = result.getResponse().getContentAsString();
+        Person personRetrieved = new ObjectMapper().readValue(contentAsString, Person.class);
+
+        assertEquals("Jack", personRetrieved.getFirstName());
+        assertEquals("Boyd", personRetrieved.getLastName());
         verify(personService, times(1)).save(any(Person.class));
     }
 
     @Test
-    public void savePersonIsNull() throws Exception {
+    public void testShouldVerifyReturningStatusWhenThereIsNoPersonToSave() throws Exception {
         MockHttpServletRequestBuilder mockRequest = post("/persons")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON);
@@ -113,32 +121,48 @@ public class PersonControllerTest {
     }
 
     @Test
-    public void updateReturnIsOKWhenPersonExitsAndHaveBeenModified() throws Exception {
-        Optional<Person> optionalPersonSave = Optional.of(Person.builder()
-                .firstName("Delor")
-                .lastName("Tity")
-                .email("ram@gmail.com")
-                .build());
+    public void testShouldReturnExceptionWhenThePersonToSaveAlreadyExist() throws Exception {
+        Person person = Person.builder()
+                .firstName("John")
+                .lastName("Boyd")
+                .address("douala")
+                .city("limbe")
+                .zip(123)
+                .phone("34-32")
+                .email("anze@gmail.com")
+                .build();
 
+        when(personService.save(any())).thenThrow(PersonAlreadyExitException.class);
+
+        String content = new ObjectMapper().writeValueAsString(person);
+        MockHttpServletRequestBuilder mockRequest = post("/persons")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(content);
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isBadRequest());
+
+        verify(personService, times(1)).save(any(Person.class));
+    }
+
+    @Test
+    public void updateReturnIsOKWhenPersonExitsAndHaveBeenModified() throws Exception {
         Optional<Person> optionalPersonUpdate = Optional.of(Person.builder()
-                .firstName("Delor")
-                .lastName("Tity")
-                .email("delor@gmail.com")
+                .firstName("Jojo")
+                .lastName("Lola")
+                .email("anz@gmail.com")
                 .build());
-        Person personSave = optionalPersonSave.get();
         Person personUpdate = optionalPersonUpdate.get();
 
-        when(personService.findByFirstnameLastname(anyString(), anyString())).thenReturn(personSave);
         when(personService.update(any(Person.class))).thenReturn(optionalPersonUpdate);
         assertTrue(optionalPersonUpdate.isPresent());
 
         String inputJson = new ObjectMapper().writeValueAsString(personUpdate);
 
         mockMvc.perform(put("/persons")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(inputJson))
-                .andExpect(status().isOk())
-                .andDo(print());
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(inputJson))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -155,27 +179,23 @@ public class PersonControllerTest {
     }
 
     @Test
-    public void deleteTestShouldReturnNoContentWhenDeleteSuccessfully() throws Exception{
-        Person person = Person.builder()
+    public void deleteTestShouldReturnNoContentWhendeleteSuccessfully() throws Exception {
+        Optional<Person> optionalPerson = Optional.of(Person.builder()
                 .firstName("John")
                 .lastName("Boyd")
                 .address("douala")
-                .build();
-        Optional<Person> optionalPerson = Optional.of(person);
-        when(personService.delete("John", "Boyd")).thenReturn(optionalPerson);
+                .build());
+        when(personService.delete("John", "BOyd")).thenReturn(optionalPerson);
 
         mockMvc.perform(delete("/persons/John/Boyd"))
                 .andExpect(status().isNoContent());
     }
 
     @Test
-    public void deleteTestShouldReturnNoFoundWhenNotDelete() throws Exception{
+    public void deleteTestShouldReturnNofoundWhenNotdelete() throws Exception {
         when(personService.delete(anyString(), anyString())).thenThrow(PersonNotFoundException.class);
 
         mockMvc.perform(delete("/persons/John/Boyd"))
-                .andExpect(status().isNotFound())
-                .andDo(print());
                 .andExpect(status().isNotFound());
-
     }
 }
