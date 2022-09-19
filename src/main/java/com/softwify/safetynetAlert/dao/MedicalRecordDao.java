@@ -11,4 +11,8 @@ public interface MedicalRecordDao {
     Optional<MedicalRecord> findMedicalRecordByFirstnameAndLastname(String firstName, String lastName);
 
     Optional<MedicalRecord> update(MedicalRecord medicalRecord);
+
+    Optional<MedicalRecord> save(MedicalRecord medicalRecord);
+
+    Optional<MedicalRecord> delete(String firstname, String lastname);
 }
