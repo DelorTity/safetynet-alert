@@ -1,6 +1,7 @@
 package com.softwify.safetynetAlert.service;
 
 import com.softwify.safetynetAlert.dao.MedicalRecordDao;
+import com.softwify.safetynetAlert.ecception.PersonAlreadyExitException;
 import com.softwify.safetynetAlert.ecception.PersonNotFoundException;
 import com.softwify.safetynetAlert.model.MedicalRecord;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     }
 
     @Override
-    public Optional<MedicalRecord> findMedicalRecordByFirstnameAndLastname(String firstName, String lastName) {
+    public Optional<MedicalRecord> findByFirstnameAndLastname(String firstName, String lastName) {
         Optional<MedicalRecord> optionalPerson = medicalRecordDao.findMedicalRecordByFirstnameAndLastname(firstName, lastName);
         return Optional.of(optionalPerson.orElseThrow(PersonNotFoundException::new));
     }
@@ -36,5 +37,21 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
         return updatedMedicalRecord;
     }
 
+    @Override
+    public Optional<MedicalRecord> save(MedicalRecord medicalRecord) {
+        Optional<MedicalRecord> optionalMedicalRecord = medicalRecordDao.save(medicalRecord);
+        if (optionalMedicalRecord.isEmpty()) {
+            throw new PersonAlreadyExitException();
+        }
+        return optionalMedicalRecord;
+    }
 
+    @Override
+    public Optional<MedicalRecord> delete(String firstname, String lastname) {
+        Optional<MedicalRecord> delete = medicalRecordDao.delete(firstname, lastname);
+        if (delete.isEmpty()) {
+            throw new PersonNotFoundException();
+        }
+        return delete;
+    }
 }

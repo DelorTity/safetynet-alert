@@ -29,7 +29,7 @@ class MedicalRecordServiceImplTest {
         Optional<MedicalRecord> optionalMedicalRecord = Optional.of(medicalRecord);
         when(medicalRecordDao.findMedicalRecordByFirstnameAndLastname(medicalRecord.getFirstName(), medicalRecord.getLastName())).thenReturn(optionalMedicalRecord);
 
-        Optional<MedicalRecord> medicalRecordRetrieved = medicalRecordService.findMedicalRecordByFirstnameAndLastname(medicalRecord.getFirstName(), medicalRecord.getLastName());
+        Optional<MedicalRecord> medicalRecordRetrieved = medicalRecordService.findByFirstnameAndLastname(medicalRecord.getFirstName(), medicalRecord.getLastName());
         assertNotNull(medicalRecordRetrieved);
         assertEquals("Marc", medicalRecordRetrieved.get().getFirstName());
         assertEquals(Collections.singletonList("Metizen:500g"), medicalRecordRetrieved.get().getMedications());

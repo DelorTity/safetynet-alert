@@ -54,7 +54,7 @@ class MedicalRecordControllerTest {
                 .firstName("John")
                 .lastName("Boyd")
                 .build();
-        when(medicalRecordService.findMedicalRecordByFirstnameAndLastname("John", "Boyd")).thenReturn(Optional.of(medicalRecord));
+        when(medicalRecordService.findByFirstnameAndLastname("John", "Boyd")).thenReturn(Optional.of(medicalRecord));
 
         String url = "/medicalRecords/John/Boyd";
         MvcResult result = mockMvc.perform(get(url))
@@ -64,17 +64,17 @@ class MedicalRecordControllerTest {
         MedicalRecord medicalRetrieved = new ObjectMapper().readValue(contentAsString, MedicalRecord.class);
 
         assertEquals("John", medicalRetrieved.getFirstName());
-        verify(medicalRecordService, times(1)).findMedicalRecordByFirstnameAndLastname("John", "Boyd");
+        verify(medicalRecordService, times(1)).findByFirstnameAndLastname("John", "Boyd");
     }
 
     @Test
     public void testShouldVerifyReturningExceptionWhenThereIsNoMedicalRecord() throws Exception {
-        when(medicalRecordService.findMedicalRecordByFirstnameAndLastname("John", "Boyd")).thenThrow(PersonNotFoundException.class);
+        when(medicalRecordService.findByFirstnameAndLastname("John", "Boyd")).thenThrow(PersonNotFoundException.class);
 
         mockMvc.perform(get("/medicalRecords/John/Boyd"))
                 .andExpect(status().isNotFound())
                 .andReturn();
 
-        verify(medicalRecordService, times(1)).findMedicalRecordByFirstnameAndLastname("John", "Boyd");
+        verify(medicalRecordService, times(1)).findByFirstnameAndLastname("John", "Boyd");
     }
 }
