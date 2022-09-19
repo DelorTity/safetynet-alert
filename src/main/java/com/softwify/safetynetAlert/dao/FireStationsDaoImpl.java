@@ -28,4 +28,38 @@ public class FireStationsDaoImpl implements FireStationsDao {
         }
         return Optional.empty();
     }
+
+    public Optional<FireStation> findFireStationByAddress(String address) {
+        List<FireStation> fireStations = dataStoreManager.getFireStation();
+        for (FireStation fireStation : fireStations) {
+            if (fireStation.getAddress().equals(address)) {
+                return Optional.of(fireStation);
+            }
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<FireStation> update(FireStation fireStation) {
+        Optional<FireStation> optionalFireStation = findFireStationByAddress(fireStation.getAddress());
+        if (optionalFireStation.isPresent()) {
+            FireStation existingFireStation = optionalFireStation.get();
+            existingFireStation.setAddress(fireStation.getAddress());
+            existingFireStation.setStation(fireStation.getStation());
+            return Optional.of(fireStation);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<FireStation> delete(String address) {
+        Optional<FireStation> optionalFireStation = findFireStationByAddress(address);
+        if (optionalFireStation.isPresent()) {
+            List<FireStation> fireStations = dataStoreManager.getFireStation();
+            FireStation fireStation = optionalFireStation.get();
+            fireStations.remove(fireStation);
+            return optionalFireStation;
+        }
+        return Optional.empty();
+    }
 }
