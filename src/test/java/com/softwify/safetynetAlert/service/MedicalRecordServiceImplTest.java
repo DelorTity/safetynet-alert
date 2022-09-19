@@ -60,4 +60,44 @@ class MedicalRecordServiceImplTest {
         assertThrows(PersonNotFoundException.class, () -> medicalRecordService.update(medicalRecord) );
         verify(medicalRecordDao, times(1)).update(medicalRecord);
     }
+
+    @Test
+    public void saveShouldVerifyThatMedicalRecordSaveIsReturn() {
+        Optional<MedicalRecord> optionalMedicalRecord = Optional.of(MedicalRecord.builder().firstName("John").lastName("Boyd").build());
+        when(medicalRecordDao.save(optionalMedicalRecord.get())).thenReturn(optionalMedicalRecord);
+
+        Optional<MedicalRecord> saveMedicalRecord = medicalRecordService.save(optionalMedicalRecord.get());
+        assertEquals("John", saveMedicalRecord.get().getFirstName());
+        assertEquals("Boyd", saveMedicalRecord.get().getLastName());
+
+        verify(medicalRecordDao, times(1)).save(optionalMedicalRecord.get());
+    }
+
+    @Test
+    public void saveShouldThrowExceptionWhenTheMedicalRecordIsNotSave() {
+        MedicalRecord medicalRecord = MedicalRecord.builder().firstName("John").lastName("Boyd").build();
+        assertThrows(PersonNotFoundException.class, () -> medicalRecordService.save(medicalRecord) );
+        verify(medicalRecordDao, times(1)).save(medicalRecord);
+    }
+
+    @Test
+    public void testShouldCheckThatDeleteProvidedPerson() {
+        MedicalRecord medicalRecord = MedicalRecord.builder()
+                .firstName("John")
+                .lastName("pierre")
+                .build();
+        when(medicalRecordDao.delete(anyString(), anyString())).thenReturn(Optional.of(medicalRecord));
+
+        Optional<MedicalRecord> deletedMedicalRecord = medicalRecordService.delete("John", "pierre");
+
+        assertTrue(deletedMedicalRecord.isPresent());
+        assertEquals("John", deletedMedicalRecord.get().getFirstName());
+        verify(medicalRecordDao, times(1)).delete("John", "pierre");
+    }
+
+    @Test
+    public void testShouldThrowExceptionWhenThePersonIsNotDelete() {
+        assertThrows(PersonNotFoundException.class, () -> medicalRecordService.delete("marc", "mbem") );
+        verify(medicalRecordDao, times(1)).delete("marc", "mbem");
+    }
 }
