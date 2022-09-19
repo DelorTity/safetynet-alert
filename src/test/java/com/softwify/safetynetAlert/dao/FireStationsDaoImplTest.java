@@ -4,13 +4,9 @@ import com.softwify.safetynetAlert.model.FireStation;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class FireStationsDaoImplTest {
@@ -63,10 +59,59 @@ public class FireStationsDaoImplTest {
     }
 
     @Test
-    void update() {
+    void testShouldReturnTrueWhenNotUpdateFireStation() {
+        FireStation fireStation = FireStation.builder()
+                .address("432 bombe sr")
+                .station(432)
+                .build();
+        Optional<FireStation> optionalFireStation = fireStationsDao.update(fireStation);
+        assertTrue(optionalFireStation.isEmpty());
     }
 
     @Test
-    void delete() {
+    void testShouldReturnFireStationWhenUpdate() {
+        FireStation updatedFireStation = FireStation.builder()
+                .address("12 mallabo dr")
+                .station(3)
+                .build();
+
+        when(dataStoreManager.getFireStation()).thenReturn(new ArrayList<>(Collections.singleton(updatedFireStation)));
+        FireStation fireStation = FireStation.builder()
+                .address("54 ndongue sr")
+                .station(432)
+                .build();
+
+        Optional<FireStation> optionalFireStation = fireStationsDao.update(fireStation);
+        assertFalse(optionalFireStation.isPresent());
+    }
+
+    @Test
+    void deleteFireStationTest() {
+        List<FireStation> fireStationsArrays = Arrays.asList(
+                FireStation.builder().address("12-Nkongsamba-LR").build(),
+                FireStation.builder().address("23-Douala-BG").build()
+        );
+        List<FireStation> fireStations = new ArrayList<>(fireStationsArrays);
+
+        when(dataStoreManager.getFireStation()).thenReturn(fireStations);
+
+        Optional<FireStation> delete = fireStationsDao.delete("12-Nkongsamba-LR");
+        assertEquals("12-Nkongsamba-LR", delete.get().getAddress());
+        verify(dataStoreManager, atLeastOnce()).getFireStation();
+    }
+
+    @Test
+    void deleteShouldStopWhenNoPersonInTheList() {
+        List<FireStation> fireStationList = Arrays.asList(
+                FireStation.builder().address("12-Ndokoti-KJ").build(),
+                FireStation.builder().address("129-Jamaique-MK").build()
+        );
+        List<FireStation> fireStations = new ArrayList<>(fireStationList);
+
+        when(dataStoreManager.getFireStation()).thenReturn(fireStations);
+
+        Optional<FireStation> delete = fireStationsDao.delete("12-kumba-JK");
+        assertTrue(delete.isEmpty());
+        verify(dataStoreManager, atLeastOnce()).getFireStation();
     }
 }
