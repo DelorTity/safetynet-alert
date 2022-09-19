@@ -8,7 +8,6 @@ import com.softwify.safetynetAlert.model.Person;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.FileCopyUtils;
 
 import java.io.InputStream;
 import java.util.List;
@@ -33,6 +32,10 @@ public class DataStoreManager implements CommandLineRunner {
 
 	public List<FireStation> getFireStation() {
 		return dataStore.getFireStations();
+	}
+
+	public List<MedicalRecord> getMedicalRecords() {
+		return dataStore.getMedicalRecords();
 	}
 
 	private static class DataStore {
