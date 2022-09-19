@@ -27,4 +27,14 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
         return Optional.of(optionalPerson.orElseThrow(PersonNotFoundException::new));
     }
 
+    @Override
+    public Optional<MedicalRecord> update(MedicalRecord medicalRecord) {
+        Optional<MedicalRecord> updatedMedicalRecord = medicalRecordDao.update(medicalRecord);
+        if(updatedMedicalRecord.isEmpty()) {
+            throw new PersonNotFoundException();
+        }
+        return updatedMedicalRecord;
+    }
+
+
 }
