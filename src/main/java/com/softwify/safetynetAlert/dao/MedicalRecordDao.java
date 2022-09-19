@@ -9,4 +9,6 @@ public interface MedicalRecordDao {
     List<MedicalRecord> findAll();
 
     Optional<MedicalRecord> findMedicalRecordByFirstnameAndLastname(String firstName, String lastName);
+
+    Optional<MedicalRecord> update(MedicalRecord medicalRecord);
 }

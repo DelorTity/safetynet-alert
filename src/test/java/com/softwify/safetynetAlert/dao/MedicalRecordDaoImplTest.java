@@ -4,10 +4,7 @@ import com.softwify.safetynetAlert.model.MedicalRecord;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -64,5 +61,42 @@ class MedicalRecordDaoImplTest {
         assertEquals("jean", optionalMedicalRecord.get().getFirstName());
         assertEquals(Collections.singletonList("abendazol:350mg"), optionalMedicalRecord.get().getMedications());
         verify(dataStoreManager, times(1)).getMedicalRecords();
+    }
+
+    @Test
+    void testShouldStopWhenTheMedicalRecordToUpdateHasBeenUpdateExist() {
+        MedicalRecord updatedMedicalRecord = MedicalRecord.builder()
+                .firstName("Sen")
+                .lastName("Floor")
+                .medications(Collections.singletonList("metizan:350mg"))
+                .build();
+        when(dataStoreManager.getMedicalRecords()).thenReturn(new ArrayList<>(Collections.singleton(updatedMedicalRecord)));
+
+        MedicalRecord medicalRecord = MedicalRecord.builder()
+                .firstName("Sen")
+                .lastName("Floor")
+                .medications(Collections.singletonList("paracetamol:350mg"))
+                .build();
+        Optional<MedicalRecord> optionalMedicalRecord = medicalRecordDao.update(medicalRecord);
+        assertEquals(Collections.singletonList("paracetamol:350mg"), medicalRecord.getMedications());
+        assertTrue(optionalMedicalRecord.isPresent());
+        verify(dataStoreManager, atLeastOnce()).getMedicalRecords();
+    }
+
+    @Test
+    void testShouldReturnFalseWhenMedicalRecordIsNotUpdated() {
+        MedicalRecord updatedMedicalRecord = MedicalRecord.builder()
+                .firstName("John")
+                .lastName("Boyd")
+                .medications(Collections.singletonList("aznol:350mg"))
+                .build();
+        when(dataStoreManager.getMedicalRecords()).thenReturn(new ArrayList<>(Collections.singleton(updatedMedicalRecord)));
+        MedicalRecord medicalRecord = MedicalRecord.builder()
+                .firstName("John")
+                .lastName("ben")
+                .medications(Collections.singletonList("aznol:350mg"))
+                .build();
+        Optional<MedicalRecord> optionalMedicalRecord = medicalRecordDao.update(medicalRecord);
+        assertFalse(optionalMedicalRecord.isPresent());
     }
 }

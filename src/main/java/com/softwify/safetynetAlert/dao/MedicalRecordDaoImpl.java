@@ -30,4 +30,17 @@ public class MedicalRecordDaoImpl implements MedicalRecordDao {
         }
         return Optional.empty();
     }
+
+    @Override
+    public Optional<MedicalRecord> update(MedicalRecord medicalRecord) {
+        Optional<MedicalRecord> optionalMedicalRecord = findMedicalRecordByFirstnameAndLastname(medicalRecord.getFirstName(), medicalRecord.getLastName());
+        if (optionalMedicalRecord.isPresent()) {
+           /* MedicalRecord existingMedicalRecord = optionalMedicalRecord.get();
+            existingMedicalRecord.setBirthdate(medicalRecord.getBirthdate());
+            existingMedicalRecord.setMedications(medicalRecord.getMedications());
+            existingMedicalRecord.setAllergies(medicalRecord.getAllergies());*/
+            return Optional.of(medicalRecord);
+        }
+        return Optional.empty();
+    }
 }
