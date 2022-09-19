@@ -1,11 +1,13 @@
 package com.softwify.safetynetAlert.service;
 
 import com.softwify.safetynetAlert.dao.MedicalRecordDao;
+import com.softwify.safetynetAlert.exceptions.PersonAlreadyExistsException;
 import com.softwify.safetynetAlert.exceptions.PersonNotFoundException;
 import com.softwify.safetynetAlert.model.MedicalRecord;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,5 +45,69 @@ public class MedicalRecordServiceImplTest {
 
         assertThrows(PersonNotFoundException.class, () -> medicalRecordService.findMedicalRecordByFirstnameAndLastname("Jack", "James"));
         verify(medicalRecordDao, times(1)).findMedicalRecordByFirstnameAndLastname("Jack", "James");
+    }
+
+    @Test
+    public void saveShouldVerifyThatMedicalRecordSaveIsReturn() {
+        Optional<MedicalRecord> optionalMedicalRecord = Optional.of(MedicalRecord.builder().firstName("John").lastName("Boyd").build());
+        when(medicalRecordDao.save(optionalMedicalRecord.get())).thenReturn(optionalMedicalRecord);
+
+        Optional<MedicalRecord> saveMedicalRecord = medicalRecordService.saveMedicalRecord(optionalMedicalRecord.get());
+        assertEquals("John", saveMedicalRecord.get().getFirstName());
+        assertEquals("Boyd", saveMedicalRecord.get().getLastName());
+
+        verify(medicalRecordDao, times(1)).save(optionalMedicalRecord.get());
+    }
+
+    @Test
+    public void saveShouldThrowExceptionWhenTheMedicalRecordIsNotSave() {
+        MedicalRecord medicalRecord = MedicalRecord.builder().firstName("John").lastName("Boyd").build();
+        assertThrows(PersonAlreadyExistsException.class, () -> medicalRecordService.saveMedicalRecord(medicalRecord) );
+        verify(medicalRecordDao, times(1)).save(medicalRecord);
+    }
+
+    @Test
+    void testShouldVerifyThatReturnUpdatedMedicalRecord() {
+        MedicalRecord medicalRecord = MedicalRecord.builder()
+                .firstName("John")
+                .lastName("Boyd")
+                .medications(Collections.singletonList("aznol:350mg"))
+                .build();
+
+        when(medicalRecordDao.update(medicalRecord)).thenReturn(Optional.of(medicalRecord));
+        Optional<MedicalRecord> updateMedicalRecord = medicalRecordService.updateMedicalRecord(medicalRecord);
+        assertTrue(updateMedicalRecord.isPresent());
+    }
+
+    @Test
+    public void testShouldThrowExceptionWhenTheMedicalRecordIsNotUpdate() {
+        MedicalRecord medicalRecord = MedicalRecord.builder()
+                .firstName("John")
+                .lastName("Boyd")
+                .medications(Collections.singletonList("aznol:350mg"))
+                .build();
+        assertThrows(PersonNotFoundException.class, () -> medicalRecordService.updateMedicalRecord(medicalRecord) );
+        verify(medicalRecordDao, times(1)).update(medicalRecord);
+    }
+
+    @Test
+    public void testShouldCheckThatDeleteProvidedPerson() {
+        MedicalRecord medicalRecord = MedicalRecord.builder()
+                .firstName("John")
+                .lastName("pierre")
+                .build();
+        when(medicalRecordDao.delete(anyString(), anyString())).thenReturn(Optional.of(medicalRecord));
+
+        Optional<MedicalRecord> deletedMedicalRecord = medicalRecordService.deleteMedicalRecord("John", "pierre");
+
+        assertTrue(deletedMedicalRecord.isPresent());
+        assertEquals("John", deletedMedicalRecord.get().getFirstName());
+        verify(medicalRecordDao, times(1)).delete("John", "pierre");
+    }
+
+    @Test
+    public void testShouldThrowExceptionWhenThePersonIsNotDelete() {
+        assertThrows(PersonNotFoundException.class, () -> medicalRecordService.deleteMedicalRecord("joe", "ben") );
+        verify(medicalRecordDao, times(1)).delete("joe", "ben");
     }
 }

@@ -106,5 +106,4 @@ public class PersonServiceImplTest {
         assertThrows(PersonNotFoundException.class, () -> personService.deletePerson("joe", "ben") );
         verify(personDao, times(1)).delete("joe", "ben");
     }
-
 }

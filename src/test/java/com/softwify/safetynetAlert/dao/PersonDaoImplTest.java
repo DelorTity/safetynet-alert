@@ -157,8 +157,8 @@ public class PersonDaoImplTest {
         List<Person> personList = new ArrayList<>(arrayPersons);
         when(dataStoreManager.getPersons()).thenReturn(personList);
 
-        Optional<Person> update = personDao.delete("job", "pierre");
-        assertTrue(update.isEmpty());
+        Optional<Person> delete = personDao.delete("job", "pierre");
+        assertTrue(delete.isEmpty());
         verify(dataStoreManager, atLeastOnce()).getPersons();
     }
 }

@@ -1,6 +1,7 @@
 package com.softwify.safetynetAlert.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.softwify.safetynetAlert.exceptions.PersonAlreadyExistsException;
 import com.softwify.safetynetAlert.exceptions.PersonNotFoundException;
 import com.softwify.safetynetAlert.model.MedicalRecord;
 import com.softwify.safetynetAlert.service.MedicalRecordService;
@@ -8,8 +9,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,7 +21,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = {MedicalRecordController.class})
@@ -82,5 +85,82 @@ public class MedicalRecordControllerTest {
                 .andReturn();
 
         verify(medicalRecordService, times(1)).findMedicalRecordByFirstnameAndLastname("John", "Boyd");
+    }
+
+    @Test
+    public void testShouldVerifyThatOkIsReturnWhenSave() throws Exception {
+        MedicalRecord medicalRecord = MedicalRecord.builder()
+                .firstName("John")
+                .lastName("Boyd")
+                .medications(Collections.singletonList("aznol:350mg"))
+                .build();
+        when(medicalRecordService.saveMedicalRecord(any())).thenReturn(Optional.of(medicalRecord));
+
+        String content = new ObjectMapper().writeValueAsString(medicalRecord);
+        MockHttpServletRequestBuilder mockRequest = post("/medicalRecords")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(content);
+        MvcResult result = mockMvc.perform(mockRequest)
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String contentAsString = result.getResponse().getContentAsString();
+        MedicalRecord medicalRetrieved = new ObjectMapper().readValue(contentAsString, MedicalRecord.class);
+
+        assertEquals("John", medicalRetrieved.getFirstName());
+        assertEquals("Boyd", medicalRetrieved.getLastName());
+        verify(medicalRecordService, times(1)).saveMedicalRecord(any(MedicalRecord.class));
+    }
+
+    @Test
+    public void testShouldVerifyReturningStatusWhenThereIsNoMedicalRecordToSave() throws Exception {
+        MockHttpServletRequestBuilder mockRequest = post("/medicalRecords")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON);
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isBadRequest())
+                .andReturn();
+    }
+
+    @Test
+    public void testShouldReturnExceptionWhenTheMedicalRecordToSaveAlreadyExist() throws Exception {
+        MedicalRecord medicalRecord = MedicalRecord.builder()
+                .firstName("John")
+                .lastName("Boyd")
+                .medications(Collections.singletonList("aznol:350mg"))
+                .build();
+        when(medicalRecordService.saveMedicalRecord(any())).thenThrow(PersonAlreadyExistsException.class);
+
+        String content = new ObjectMapper().writeValueAsString(medicalRecord);
+        MockHttpServletRequestBuilder mockRequest = post("/medicalRecords")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(content);
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isBadRequest());
+
+        verify(medicalRecordService, times(1)).saveMedicalRecord(any(MedicalRecord.class));
+    }
+
+    @Test
+    public void deleteTestShouldReturnNoContentWhenDeleteSuccessfully() throws Exception {
+        MedicalRecord medicalRecord = MedicalRecord.builder()
+                .firstName("John")
+                .lastName("Boyd")
+                .medications(Collections.singletonList("aznol:350mg"))
+                .build();
+        when(medicalRecordService.deleteMedicalRecord("John", "BOyd")).thenReturn(Optional.of(medicalRecord));
+
+        mockMvc.perform(delete("/medicalRecords/John/Boyd"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void testShouldReturnNofoundWhenNotdelete() throws Exception {
+        when(medicalRecordService.deleteMedicalRecord(anyString(), anyString())).thenThrow(PersonNotFoundException.class);
+
+        mockMvc.perform(delete("/medicalRecords/John/Boyd"))
+                .andExpect(status().isNotFound());
     }
 }

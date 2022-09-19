@@ -29,4 +29,47 @@ public class MedicalRecordDaoImpl implements MedicalRecordDao{
         }
         return Optional.empty();
     }
+
+    @Override
+    public Optional<MedicalRecord> save(MedicalRecord medicalRecord) {
+
+        Optional<MedicalRecord> optionalMedicalRecord = findMedicalRecordByFirstnameAndLastname(medicalRecord.getFirstName(), medicalRecord.getLastName());
+        if (optionalMedicalRecord.isPresent()) {
+            return Optional.empty();
+        }
+        List<MedicalRecord> medicalRecords = dataStoreManager.getMedicalRecords();
+        medicalRecords.add(medicalRecord);
+        return Optional.of(medicalRecord);
+    }
+
+    @Override
+    public Optional<MedicalRecord> update(MedicalRecord medicalRecord) {
+        Optional<MedicalRecord> optionalMedicalRecord = findMedicalRecordByFirstnameAndLastname(medicalRecord.getFirstName(), medicalRecord.getLastName());
+
+        if (optionalMedicalRecord.isPresent()) {
+            MedicalRecord existingMedicalRecord = optionalMedicalRecord.get();
+
+            existingMedicalRecord.setFirstName(medicalRecord.getFirstName());
+            existingMedicalRecord.setLastName(medicalRecord.getLastName());
+            existingMedicalRecord.setBirthdate(medicalRecord.getBirthdate());
+            existingMedicalRecord.setMedications(medicalRecord.getMedications());
+            existingMedicalRecord.setAllergies(medicalRecord.getAllergies());
+
+            return optionalMedicalRecord;
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<MedicalRecord> delete(String firstname, String lastname) {
+        Optional<MedicalRecord> optionalMedicalRecord = findMedicalRecordByFirstnameAndLastname(firstname, lastname);
+        if (optionalMedicalRecord.isPresent()) {
+            List<MedicalRecord> medicalRecords = dataStoreManager.getMedicalRecords();
+            MedicalRecord medicalRecord = optionalMedicalRecord.get();
+            medicalRecords.remove(medicalRecord);
+            return optionalMedicalRecord;
+        }
+        return Optional.empty();
+    }
 }

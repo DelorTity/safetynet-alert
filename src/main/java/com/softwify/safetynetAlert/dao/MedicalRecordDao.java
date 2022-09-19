@@ -8,5 +8,7 @@ import java.util.Optional;
 public interface MedicalRecordDao {
     List<MedicalRecord> findAll();
     Optional<MedicalRecord> findMedicalRecordByFirstnameAndLastname(String firstName, String lastName);
-
+    Optional<MedicalRecord> save(MedicalRecord medicalRecord);
+    Optional<MedicalRecord> update(MedicalRecord medicalRecord);
+    Optional<MedicalRecord> delete(String firstname, String lastname);
 }
