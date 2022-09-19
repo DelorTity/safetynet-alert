@@ -9,8 +9,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
+@Data
 public class MedicalRecord {
     private String firstName;
     private String lastName;
