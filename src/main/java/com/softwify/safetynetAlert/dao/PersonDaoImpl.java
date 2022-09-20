@@ -69,4 +69,11 @@ public class PersonDaoImpl implements PersonDao {
         }
         return Optional.empty();
     }
+
+    @Override
+    public List<Person> findByAddress(String address) {
+        List<Person> persons = dataStoreManager.getPersons();
+        persons.removeIf(person -> !address.contains(person.getAddress()));
+        return persons;
+    }
 }

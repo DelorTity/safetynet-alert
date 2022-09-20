@@ -1,21 +1,35 @@
 package com.softwify.safetynetAlert.service;
 
-import com.softwify.safetynetAlert.dao.PersonStationDao;
+import com.softwify.safetynetAlert.dao.FireStationDao;
+import com.softwify.safetynetAlert.dao.PersonDao;
+import com.softwify.safetynetAlert.dto.PersonStation;
+import com.softwify.safetynetAlert.mappers.PersonMapper;
+import com.softwify.safetynetAlert.model.FireStation;
 import com.softwify.safetynetAlert.model.Person;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class PersonStationServiceImpl implements PersonStationService {
-    private PersonStationDao personStationDao;
+    private FireStationDao fireStationDao;
+    private PersonDao personDao;
 
-    public PersonStationServiceImpl(PersonStationDao fireDtoDao) {
-        this.personStationDao = fireDtoDao;
+    public PersonStationServiceImpl(FireStationDao fireStationDao, PersonDao personDao) {
+        this.fireStationDao = fireStationDao;
+        this.personDao = personDao;
     }
 
     @Override
-    public List<Person> findPersonByStation(int station) {
-        return personStationDao.findPersonByStation(station);
+    public List<PersonStation> findPersonByStation(int stationNumber) {
+        List<FireStation> fireStations = fireStationDao.findByStationNumber(stationNumber);
+        List<Person> persons = new ArrayList<>();
+        for (FireStation fireStation : fireStations) {
+            List<Person> personsFromAddress = personDao.findByAddress(fireStation.getAddress());
+            persons.addAll(personsFromAddress);
+        }
+
+        return PersonMapper.mapToPersonStations(persons);
     }
 }
