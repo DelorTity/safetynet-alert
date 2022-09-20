@@ -45,20 +45,20 @@ public class FireStationServiceImplTest {
     public void getFireStationByAdressShouldReturnTheInformations() {
         FireStation fireStation = FireStation.builder().address("12 tokyo dr").station(3).build();
         Optional<FireStation> optionalPerson = Optional.of(fireStation);
-        when(fireStationDao.findFireStationByAddress("12 tokyo dr")).thenReturn(optionalPerson);
+        when(fireStationDao.findByAddress("12 tokyo dr")).thenReturn(optionalPerson);
 
         Optional<FireStation> firestationRetrieved = fireStationService.findFireStationByAddress("12 tokyo dr");
         assertNotNull(firestationRetrieved);
         assertEquals("12 tokyo dr", firestationRetrieved.get().getAddress());
         assertEquals(3, firestationRetrieved.get().getStation());
 
-        verify(fireStationDao, times(1)).findFireStationByAddress("12 tokyo dr");
+        verify(fireStationDao, times(1)).findByAddress("12 tokyo dr");
     }
 
     @Test
     public void getFireStationByAdressShouldThrowExceptionWhenThereIsNoPerson() {
         assertThrows(FireStationNotFoundException.class, () -> fireStationService.findFireStationByAddress("12 tokyo dr"));
-        verify(fireStationDao, times(1)).findFireStationByAddress("12 tokyo dr");
+        verify(fireStationDao, times(1)).findByAddress("12 tokyo dr");
     }
 
     @Test

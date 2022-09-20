@@ -66,7 +66,7 @@ public class FireStationDaoImplTest {
         );
         when(dataStoreManager.getFireStation()).thenReturn(fireStations);
 
-        Optional<FireStation> fireStationByAdresse = fireStationDao.findFireStationByAddress("tokyo dr");
+        Optional<FireStation> fireStationByAdresse = fireStationDao.findByAddress("tokyo dr");
         assertFalse(fireStationByAdresse.isPresent());
 
         verify(dataStoreManager, times(1)).getFireStation();
@@ -80,7 +80,7 @@ public class FireStationDaoImplTest {
         );
         when(dataStoreManager.getFireStation()).thenReturn(fireStations);
 
-        Optional<FireStation> optionalFireStation = fireStationDao.findFireStationByAddress("12 tokyo dr");
+        Optional<FireStation> optionalFireStation = fireStationDao.findByAddress("12 tokyo dr");
 
         assertTrue(optionalFireStation.isPresent());
         assertEquals(3, optionalFireStation.get().getStation());

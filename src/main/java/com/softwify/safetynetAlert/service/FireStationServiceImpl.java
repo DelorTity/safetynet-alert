@@ -24,7 +24,7 @@ public class FireStationServiceImpl implements FireStationService{
 
     @Override
     public Optional<FireStation> findFireStationByAddress(String address) {
-        Optional<FireStation> optionalFireStation = fireStationDao.findFireStationByAddress(address);
+        Optional<FireStation> optionalFireStation = fireStationDao.findByAddress(address);
         return Optional.of(optionalFireStation.orElseThrow(FireStationNotFoundException::new));
     }
 
