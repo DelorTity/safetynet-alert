@@ -36,6 +36,7 @@ public class DataStoreManager implements CommandLineRunner {
 		return dataStore.getMedicalRecords();
 	}
 
+
 	private static class DataStore {
 		private List<Person> persons;
 
