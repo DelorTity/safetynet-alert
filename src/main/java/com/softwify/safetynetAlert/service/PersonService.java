@@ -10,7 +10,7 @@ public interface PersonService {
 
     Person findByFirstnameLastname(String firstName, String lastName);
 
-    Person save(Person personList);
+    Optional<Person> save(Person personList);
 
     Optional<Person> update(Person person);
 

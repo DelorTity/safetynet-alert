@@ -29,9 +29,9 @@ public class PersonServiceImpl implements PersonService {
         return optionalPerson.orElseThrow(PersonNotFoundException::new);
     }
     @Override
-    public Person save(Person person) {
-        Person addNewPerson = personDao.addNewPerson(person);
-        if(addNewPerson == null) {
+    public Optional<Person> save(Person person) {
+        Optional<Person> addNewPerson = personDao.addNewPerson(person);
+        if(addNewPerson.isEmpty()) {
             throw new PersonAlreadyExitException();
         }
         return addNewPerson;

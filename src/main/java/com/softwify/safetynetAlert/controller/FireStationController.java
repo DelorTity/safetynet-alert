@@ -1,5 +1,6 @@
 package com.softwify.safetynetAlert.controller;
 
+import com.softwify.safetynetAlert.ecception.FireStationAlreadyExitsException;
 import com.softwify.safetynetAlert.ecception.FireStationNotFoundException;
 import com.softwify.safetynetAlert.ecception.PersonNotFoundException;
 import com.softwify.safetynetAlert.model.FireStation;
@@ -25,9 +26,13 @@ public class FireStationController {
 
     @PostMapping
     public ResponseEntity<FireStation> addFireStation(@RequestBody FireStation fireStation) {
-        Optional<FireStation> optionalFireStation = fireStationServices.addFireStation(fireStation);
-        FireStation addedFireStation = optionalFireStation.get();
-        return ResponseEntity.ok(addedFireStation);
+        try {
+            Optional<FireStation> optionalFireStation = fireStationServices.addFireStation(fireStation);
+            FireStation newFireStation = optionalFireStation.get();
+            return ResponseEntity.ok(newFireStation);
+        } catch (FireStationAlreadyExitsException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping(value = "/{address}")

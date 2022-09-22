@@ -92,7 +92,7 @@ public class PersonControllerTest {
                 .email("anze@gmail.com")
                 .build());
 
-        when(personService.save(any())).thenReturn(person.get());
+        when(personService.save(any())).thenReturn(person);
         String content = new ObjectMapper().writeValueAsString(person);
         MockHttpServletRequestBuilder mockRequest = post("/persons")
                 .contentType(MediaType.APPLICATION_JSON)

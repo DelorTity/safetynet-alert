@@ -1,5 +1,6 @@
 package com.softwify.safetynetAlert.controller;
 
+import com.softwify.safetynetAlert.ecception.PersonAlreadyExitException;
 import com.softwify.safetynetAlert.ecception.PersonNotFoundException;
 import com.softwify.safetynetAlert.model.MedicalRecord;
 import com.softwify.safetynetAlert.service.MedicalRecordService;
@@ -49,7 +50,7 @@ public class MedicalRecordController {
         try {
             Optional<MedicalRecord> optionalMedicalRecord = medicalRecordService.save(medicalRecord);
             return ResponseEntity.ok(optionalMedicalRecord.get());
-        } catch (PersonNotFoundException e) {
+        } catch (PersonAlreadyExitException e) {
             return ResponseEntity.badRequest().build();
         }
     }

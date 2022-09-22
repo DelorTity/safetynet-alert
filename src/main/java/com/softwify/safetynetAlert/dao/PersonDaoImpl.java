@@ -31,15 +31,15 @@ public class PersonDaoImpl implements PersonDao {
     }
 
     @Override
-    public Person addNewPerson(Person person) {
+    public Optional<Person> addNewPerson(Person person) {
         List<Person> persons = dataStoreManager.getPersons();
         Optional<Person> personByFirstnameAndLastname = findPersonByFirstnameAndLastname(person.getFirstName(), person.getLastName());
         if(personByFirstnameAndLastname.isPresent()) {
-            return null;
+            return Optional.empty();
         } else {
             persons.add(person);
         }
-        return person;
+        return Optional.of(person);
     }
 
     @Override
@@ -68,5 +68,12 @@ public class PersonDaoImpl implements PersonDao {
             return optionalPerson;
         }
         return Optional.empty();
+    }
+
+    @Override
+    public List<Person> findByAddress(String address) {
+        List<Person> persons = dataStoreManager.getPersons();
+        persons.removeIf(person -> !address.contains(person.getAddress()));
+        return persons;
     }
 }

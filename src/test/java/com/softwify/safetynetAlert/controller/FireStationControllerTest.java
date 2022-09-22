@@ -1,6 +1,7 @@
 package com.softwify.safetynetAlert.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.softwify.safetynetAlert.ecception.FireStationAlreadyExitsException;
 import com.softwify.safetynetAlert.ecception.FireStationNotFoundException;
 import com.softwify.safetynetAlert.ecception.PersonNotFoundException;
 import com.softwify.safetynetAlert.model.FireStation;
@@ -72,6 +73,25 @@ public class FireStationControllerTest {
     }
 
     @Test
+    public void testShdVerifyThatBadStatusReturnWhenNotSave() throws Exception {
+        FireStation fireStation = FireStation.builder()
+                .address("12-doul")
+                .build();
+
+        when(fireStationService.addFireStation(any())).thenThrow(FireStationAlreadyExitsException.class);
+        String content = new ObjectMapper().writeValueAsString(fireStation);
+        MockHttpServletRequestBuilder mockRequest = post("/firestations")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(content);
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        verify(fireStationService, times(1)).addFireStation(any());
+    }
+
+    @Test
     public void testShouldVerifyThatStatusIsOkAndReturnTheFireStation() throws Exception {
         FireStation fireStation = FireStation.builder()
                 .address("12 Douala")
@@ -126,7 +146,7 @@ public class FireStationControllerTest {
     }
 
     @Test
-    public void deleteTestShouldReturnNoContentWhendeleteSuccessfully() throws Exception {
+    public void deleteTestShouldReturnNoContentWhenDeleteSuccessfully() throws Exception {
         FireStation fireStation = FireStation.builder()
                 .address("13 koulouloun sr")
                 .station(54)
@@ -138,9 +158,8 @@ public class FireStationControllerTest {
     }
 
     @Test
-    public void deleteTestShouldReturnNofoundWhenNotdelete() throws Exception {
+    public void deleteTestShouldReturnNotFoundWhenNotDelete() throws Exception {
         when(fireStationService.deleteFireStation(anyString())).thenThrow(PersonNotFoundException.class);
-
         mockMvc.perform(delete("/firestations/143 pk14 sr"))
                 .andExpect(status().isNotFound());
     }

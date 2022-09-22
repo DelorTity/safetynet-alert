@@ -1,6 +1,7 @@
 package com.softwify.safetynetAlert.service;
 
 import com.softwify.safetynetAlert.dao.FireStationsDao;
+import com.softwify.safetynetAlert.ecception.FireStationAlreadyExitsException;
 import com.softwify.safetynetAlert.ecception.FireStationNotFoundException;
 import com.softwify.safetynetAlert.model.FireStation;
 import org.junit.jupiter.api.Test;
@@ -11,82 +12,93 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class FireStationServicesImplTest {
-    FireStationsDao fireStationsDao = Mockito.mock(FireStationsDao.class);
-    FireStationServicesImpl fireStationServices = new FireStationServicesImpl(fireStationsDao);
+public class FireStationServicesImplTest {
+    FireStationsDao fireStationDao = Mockito.mock(FireStationsDao.class);
+    FireStationServicesImpl fireStationService = new FireStationServicesImpl(fireStationDao);
+
     @Test
-    public void testShouldVerifyTheNumberOfTimeThatPersonDaoIsCallIntoPersonService() {
-        fireStationsDao.findAll();
-        verify(fireStationsDao, times(1)).findAll();
+    public void testShouldVerifyTheNumberOfTimeThatDaoIsCallIntoService() {
+        fireStationService.findAll();
+        verify(fireStationDao, times(1)).findAll();
     }
 
     @Test
     public void testShouldVerifyThatFireStationSaveIsReturn() {
-        FireStation fireStation = FireStation.builder().station(10).build();
+        FireStation fireStation = FireStation.builder().station(3).build();
         Optional<FireStation> optionalFireStation = Optional.of(fireStation);
-        when(fireStationsDao.save(fireStation)).thenReturn(optionalFireStation);
+        when(fireStationDao.save(fireStation)).thenReturn(optionalFireStation);
 
-        Optional<FireStation> saveFireStation = fireStationServices.addFireStation(fireStation);
-        assertEquals(10, saveFireStation.get().getStation());
+        Optional<FireStation> saveFireStation = fireStationService.addFireStation(fireStation);
 
-        verify(fireStationsDao, times(1)).save(fireStation);
+        assertTrue(saveFireStation.isPresent());
+        assertEquals(3, saveFireStation.get().getStation());
+
+        verify(fireStationDao, times(1)).save(fireStation);
     }
 
     @Test
-    public void getFireStationByAdressShouldReturnTheInformations() {
-        FireStation fireStation = FireStation.builder().address("12 loum dr").station(3).build();
+    public void saveShouldThrowExceptionWhenTheFireStationIsNotSave() {
+        FireStation fireStation = FireStation.builder().station(3).build();
+        assertThrows(FireStationAlreadyExitsException.class, () -> fireStationService.addFireStation(fireStation) );
+        verify(fireStationDao, times(1)).save(fireStation);
+    }
+
+    @Test
+    public void getFireStationByAddressShouldReturnInformations() {
+        FireStation fireStation = FireStation.builder().address("12 tokyo dr").station(3).build();
         Optional<FireStation> optionalPerson = Optional.of(fireStation);
-        when(fireStationsDao.findFireStationByAddress("12 loum dr")).thenReturn(optionalPerson);
+        when(fireStationDao.findByAddress("12 tokyo dr")).thenReturn(optionalPerson);
 
-        Optional<FireStation> fireStationRetrieved = fireStationServices.findFireStationByAddress("12 loum dr");
-        assertNotNull(fireStationRetrieved);
-        assertEquals("12 loum dr", fireStationRetrieved.get().getAddress());
-        assertEquals(3,fireStationRetrieved.get().getStation());
+        Optional<FireStation> fireStationRetrieved = fireStationService.findFireStationByAddress("12 tokyo dr");
 
-        verify(fireStationsDao, times(1)).findFireStationByAddress("12 loum dr");
+        assertTrue(fireStationRetrieved.isPresent());
+        assertEquals("12 tokyo dr", fireStationRetrieved.get().getAddress());
+        assertEquals(3, fireStationRetrieved.get().getStation());
+
+        verify(fireStationDao, times(1)).findByAddress("12 tokyo dr");
     }
 
     @Test
-    public void getFireStationByAdressShouldThrowExceptionWhenThereIsNoPerson() {
-        assertThrows(FireStationNotFoundException.class, () -> fireStationServices.findFireStationByAddress("12 Melon dr"));
-        verify(fireStationsDao, times(1)).findFireStationByAddress("12 Melon dr");
+    public void getFireStationByAddressShouldThrowExceptionWhenThereIsNoPerson() {
+        assertThrows(FireStationNotFoundException.class, () -> fireStationService.findFireStationByAddress("12 tokyo dr"));
+        verify(fireStationDao, times(1)).findByAddress("12 tokyo dr");
     }
 
     @Test
     void testShouldVerifyThatUpdateFireStationIsReturn() {
-        FireStation fireStation = FireStation.builder().address("12 Jombe dr").station(3).build();
+        FireStation fireStation = FireStation.builder().address("12 tokyo dr").station(3).build();
 
-        when(fireStationsDao.update(fireStation)).thenReturn(Optional.of(fireStation));
-        Optional<FireStation> updateFireStation = fireStationServices.updateFireStation(fireStation);
+        when(fireStationDao.update(fireStation)).thenReturn(Optional.of(fireStation));
+        Optional<FireStation> updateFireStation = fireStationService.updateFireStation(fireStation);
 
         assertTrue(updateFireStation.isPresent());
-        assertEquals("12 Jombe dr", updateFireStation.get().getAddress());
-        verify(fireStationsDao, times(1)).update(fireStation);
+        assertEquals("12 tokyo dr", updateFireStation.get().getAddress());
+        verify(fireStationDao, times(1)).update(fireStation);
     }
 
     @Test
     public void testShouldThrowExceptionWhenTheFireStationIsNotUpdate() {
         FireStation fireStation = FireStation.builder().address("12 tokyo dr").station(3).build();
-        assertThrows(FireStationNotFoundException.class, () -> fireStationServices.updateFireStation(fireStation) );
-        verify(fireStationsDao, times(1)).update(fireStation);
+        assertThrows(FireStationNotFoundException.class, () -> fireStationService.updateFireStation(fireStation) );
+        verify(fireStationDao, times(1)).update(fireStation);
     }
 
     @Test
     public void testShouldCheckThatDeleteProvidedFireStation() {
-        FireStation fireStation = FireStation.builder().address("12 Douala dr").station(3).build();
+        FireStation fireStation = FireStation.builder().address("12 tokyo dr").station(3).build();
 
-        when(fireStationsDao.delete("12 Douala dr")).thenReturn(Optional.of(fireStation));
+        when(fireStationDao.delete("12 tokyo dr")).thenReturn(Optional.of(fireStation));
 
-        Optional<FireStation> deleteFireStation = fireStationServices.deleteFireStation("12 Douala dr");
+        Optional<FireStation> deleteFireStation = fireStationService.deleteFireStation("12 tokyo dr");
         assertTrue(deleteFireStation.isPresent());
-        assertEquals("12 Douala dr", deleteFireStation.get().getAddress());
-        verify(fireStationsDao, times(1)).delete("12 Douala dr");
+        assertEquals("12 tokyo dr", deleteFireStation.get().getAddress());
+        verify(fireStationDao, times(1)).delete("12 tokyo dr");
     }
 
     @Test
     public void testShouldThrowExceptionWhenTheFireStationIsNotDelete() {
-        assertThrows(FireStationNotFoundException.class, () -> fireStationServices.deleteFireStation("12 berlin dr") );
-        verify(fireStationsDao, times(1)).delete("12 berlin dr");
+        assertThrows(FireStationNotFoundException.class, () -> fireStationService.deleteFireStation("12 berlin dr") );
+        verify(fireStationDao, times(1)).delete("12 berlin dr");
     }
 
 }
