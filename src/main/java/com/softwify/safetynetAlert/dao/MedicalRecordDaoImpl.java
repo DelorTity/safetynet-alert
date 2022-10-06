@@ -20,7 +20,7 @@ public class MedicalRecordDaoImpl implements MedicalRecordDao{
     }
 
     @Override
-    public Optional<MedicalRecord> findMedicalRecordByFirstnameAndLastname(String firstName, String lastName) {
+    public Optional<MedicalRecord> findByFirstnameAndLastname(String firstName, String lastName) {
         List<MedicalRecord> medicalRecords = dataStoreManager.getMedicalRecords();
         for (MedicalRecord medicalRecord: medicalRecords) {
             if (medicalRecord.getFirstName().equals(firstName) && medicalRecord.getLastName().equals(lastName)) {
@@ -33,7 +33,7 @@ public class MedicalRecordDaoImpl implements MedicalRecordDao{
     @Override
     public Optional<MedicalRecord> save(MedicalRecord medicalRecord) {
 
-        Optional<MedicalRecord> optionalMedicalRecord = findMedicalRecordByFirstnameAndLastname(medicalRecord.getFirstName(), medicalRecord.getLastName());
+        Optional<MedicalRecord> optionalMedicalRecord = findByFirstnameAndLastname(medicalRecord.getFirstName(), medicalRecord.getLastName());
         if (optionalMedicalRecord.isPresent()) {
             return Optional.empty();
         }
@@ -44,7 +44,7 @@ public class MedicalRecordDaoImpl implements MedicalRecordDao{
 
     @Override
     public Optional<MedicalRecord> update(MedicalRecord medicalRecord) {
-        Optional<MedicalRecord> optionalMedicalRecord = findMedicalRecordByFirstnameAndLastname(medicalRecord.getFirstName(), medicalRecord.getLastName());
+        Optional<MedicalRecord> optionalMedicalRecord = findByFirstnameAndLastname(medicalRecord.getFirstName(), medicalRecord.getLastName());
 
         if (optionalMedicalRecord.isPresent()) {
             MedicalRecord existingMedicalRecord = optionalMedicalRecord.get();
@@ -63,7 +63,7 @@ public class MedicalRecordDaoImpl implements MedicalRecordDao{
 
     @Override
     public Optional<MedicalRecord> delete(String firstname, String lastname) {
-        Optional<MedicalRecord> optionalMedicalRecord = findMedicalRecordByFirstnameAndLastname(firstname, lastname);
+        Optional<MedicalRecord> optionalMedicalRecord = findByFirstnameAndLastname(firstname, lastname);
         if (optionalMedicalRecord.isPresent()) {
             List<MedicalRecord> medicalRecords = dataStoreManager.getMedicalRecords();
             MedicalRecord medicalRecord = optionalMedicalRecord.get();

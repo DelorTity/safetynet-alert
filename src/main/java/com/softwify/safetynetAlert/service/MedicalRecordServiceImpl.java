@@ -24,7 +24,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService{
 
     @Override
     public Optional<MedicalRecord> findMedicalRecordByFirstnameAndLastname(String firstName, String lastName) {
-        Optional<MedicalRecord> optionalPerson = medicalRecordDao.findMedicalRecordByFirstnameAndLastname(firstName, lastName);
+        Optional<MedicalRecord> optionalPerson = medicalRecordDao.findByFirstnameAndLastname(firstName, lastName);
         return Optional.of(optionalPerson.orElseThrow(PersonNotFoundException::new));
     }
 

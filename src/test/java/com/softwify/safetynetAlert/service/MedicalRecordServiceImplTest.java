@@ -29,22 +29,22 @@ public class MedicalRecordServiceImplTest {
         String lastName = "Boyd";
         MedicalRecord medicalRecord = MedicalRecord.builder().firstName("John").lastName("Boyd").build();
         Optional<MedicalRecord> optionalMedicalRecord = Optional.of(medicalRecord);
-        when(medicalRecordDao.findMedicalRecordByFirstnameAndLastname(firstName, lastName)).thenReturn(optionalMedicalRecord);
+        when(medicalRecordDao.findByFirstnameAndLastname(firstName, lastName)).thenReturn(optionalMedicalRecord);
 
         Optional<MedicalRecord> medicalRecordRetrieved = medicalRecordService.findMedicalRecordByFirstnameAndLastname(firstName, lastName);
         assertNotNull(medicalRecordRetrieved);
         assertEquals("John", medicalRecordRetrieved.get().getFirstName());
         assertEquals("Boyd", medicalRecordRetrieved.get().getLastName());
 
-        verify(medicalRecordDao, times(1)).findMedicalRecordByFirstnameAndLastname(firstName, lastName);
+        verify(medicalRecordDao, times(1)).findByFirstnameAndLastname(firstName, lastName);
     }
 
     @Test
     public void getPersonByFirstnameAndLastnameShouldThrowExceptionWhenThereIsNoPerson() {
-        when(medicalRecordDao.findMedicalRecordByFirstnameAndLastname(anyString(), anyString())).thenReturn(Optional.empty());
+        when(medicalRecordDao.findByFirstnameAndLastname(anyString(), anyString())).thenReturn(Optional.empty());
 
         assertThrows(PersonNotFoundException.class, () -> medicalRecordService.findMedicalRecordByFirstnameAndLastname("Jack", "James"));
-        verify(medicalRecordDao, times(1)).findMedicalRecordByFirstnameAndLastname("Jack", "James");
+        verify(medicalRecordDao, times(1)).findByFirstnameAndLastname("Jack", "James");
     }
 
     @Test

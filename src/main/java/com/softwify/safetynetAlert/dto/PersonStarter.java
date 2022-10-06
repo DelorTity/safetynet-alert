@@ -5,13 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
+import java.util.List;
+
 @Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PersonStation {
-    private String firstname;
-    private String lastname;
-    private String address;
-    private String phone;
+public class PersonStarter {
+    List<PersonStation> persons;
+    int numberOfAdults;
+    int numberOfChildren;
 }
