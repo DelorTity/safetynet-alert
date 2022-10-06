@@ -12,13 +12,12 @@ public class PersonMapper {
     }
 
     public static PersonStation mapToPersonStation(Person person) {
-        PersonStation personStation = PersonStation.builder()
+        return PersonStation.builder()
                 .firstname(person.getFirstName())
                 .lastname(person.getLastName())
                 .address(person.getAddress())
                 .phone(person.getPhone())
                 .build();
-        return personStation;
     }
 
     public static List<PersonStation> mapToPersonStations(List<Person> persons) {

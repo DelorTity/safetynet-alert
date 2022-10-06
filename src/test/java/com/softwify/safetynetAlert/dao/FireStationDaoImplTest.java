@@ -143,4 +143,36 @@ public class FireStationDaoImplTest {
         assertTrue(delete.isEmpty());
         verify(dataStoreManager, atLeastOnce()).getFireStation();
     }
+
+    @Test
+    public void testShouldReturnFireStationWithTheExpectedStationAndSize() {
+        List<FireStation> fireStations = Arrays.asList(
+                FireStation.builder().address("12-limbe-DR").station(8).build(),
+                FireStation.builder().address("12-limbe").station(8).build(),
+                FireStation.builder().address("129-Douala-DR").station(2).build()
+        );
+        when(dataStoreManager.getFireStation()).thenReturn(fireStations);
+
+        List<FireStation> firestationByStationNumber = fireStationDao.findByStationNumber(8);
+
+        assertEquals(2, firestationByStationNumber.size());
+        assertEquals("12-limbe-DR", firestationByStationNumber.get(0).getAddress());
+        assertEquals("12-limbe", firestationByStationNumber.get(1).getAddress());
+        verify(dataStoreManager, times(1)).getFireStation();
+    }
+
+    @Test
+    public void testShouldReturnEmptyWhenNotExistingFireStation() {
+        List<FireStation> fireStations = Arrays.asList(
+                FireStation.builder().address("12-limbe-DR").station(8).build(),
+                FireStation.builder().address("12-limbe").station(8).build(),
+                FireStation.builder().address("129-Douala-DR").station(2).build()
+        );
+        when(dataStoreManager.getFireStation()).thenReturn(fireStations);
+
+        List<FireStation> firestationByStationNumber = fireStationDao.findByStationNumber(3);
+
+        assertTrue(firestationByStationNumber.isEmpty());
+        verify(dataStoreManager, times(1)).getFireStation();
+    }
 }

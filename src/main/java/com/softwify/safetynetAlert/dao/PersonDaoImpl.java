@@ -3,6 +3,7 @@ package com.softwify.safetynetAlert.dao;
 import com.softwify.safetynetAlert.model.Person;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -72,7 +73,7 @@ public class PersonDaoImpl implements PersonDao {
 
     @Override
     public List<Person> findByAddress(String address) {
-        List<Person> persons = dataStoreManager.getPersons();
+        List<Person> persons = new ArrayList<>(dataStoreManager.getPersons());
         persons.removeIf(person -> !address.contains(person.getAddress()));
         return persons;
     }

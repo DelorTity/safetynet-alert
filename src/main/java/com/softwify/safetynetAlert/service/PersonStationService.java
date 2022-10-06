@@ -1,10 +1,8 @@
 package com.softwify.safetynetAlert.service;
 
-import com.softwify.safetynetAlert.dto.PersonStation;
-
-import java.util.List;
+import com.softwify.safetynetAlert.dto.PersonStarter;
 
 public interface PersonStationService {
-    List<PersonStation> findPersonByStation(int station);
+    PersonStarter findPersonByStation(int station);
 
 }

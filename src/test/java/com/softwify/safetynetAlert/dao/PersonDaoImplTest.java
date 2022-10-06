@@ -70,9 +70,11 @@ public class PersonDaoImplTest {
 
         when(dataStoreManager.getPersons()).thenReturn(persons);
 
-        Person person = Person.builder().build();
+        Person person = Person.builder().firstName("anze").build();
         Optional<Person> optionalPerson = personDao.addPerson(person);
 
+        assertTrue(optionalPerson.isPresent());
+        assertEquals("anze", optionalPerson.get().getFirstName());
         assertEquals(3, persons.size());
     }
 
@@ -144,6 +146,7 @@ public class PersonDaoImplTest {
         when(dataStoreManager.getPersons()).thenReturn(personList);
 
         Optional<Person> delete = personDao.delete("john", "pierre");
+        assertTrue(delete.isPresent());
         assertEquals("john", delete.get().getFirstName());
         verify(dataStoreManager, atLeastOnce()).getPersons();
     }
@@ -160,5 +163,40 @@ public class PersonDaoImplTest {
         Optional<Person> delete = personDao.delete("job", "pierre");
         assertTrue(delete.isEmpty());
         verify(dataStoreManager, atLeastOnce()).getPersons();
+    }
+
+    @Test
+    public void getPersonsByAddressReturnExpectedSizeAndPersonInformations() {
+        List<Person> persons = Arrays.asList(
+                Person.builder().firstName("john").address("douala").build(),
+                Person.builder().firstName("jean").address("bafia").build(),
+                Person.builder().firstName("andre").address("douala").build(),
+                Person.builder().firstName("jean").address("yde").build()
+        );
+        when(dataStoreManager.getPersons()).thenReturn(persons);
+
+        List<Person> address = personDao.findByAddress("douala");
+
+        assertEquals(2, address.size());
+        assertEquals("douala", address.get(0).getAddress());
+        assertEquals("andre", address.get(1).getFirstName());
+
+        verify(dataStoreManager, times(1)).getPersons();
+    }
+
+    @Test
+    public void getPersonsByAddressShouldReturnEmptyWhenNotExistingAddress() {
+        List<Person> persons = Arrays.asList(
+                Person.builder().firstName("john").address("douala").build(),
+                Person.builder().firstName("jean").address("bafia").build(),
+                Person.builder().firstName("andre").address("douala").build(),
+                Person.builder().firstName("jean").address("yde").build()
+        );
+        when(dataStoreManager.getPersons()).thenReturn(persons);
+
+        List<Person> address = personDao.findByAddress("bertoua");
+
+        assertTrue(address.isEmpty());
+        verify(dataStoreManager, times(1)).getPersons();
     }
 }

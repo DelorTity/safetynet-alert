@@ -25,6 +25,7 @@ public class DataStoreManager implements CommandLineRunner {
 	}
 
 	public List<Person> getPersons() {
+		//Collections.unmodifiableList()
 		return dataStore.getPersons();
 	}
 
