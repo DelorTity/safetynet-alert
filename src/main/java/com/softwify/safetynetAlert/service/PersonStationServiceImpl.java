@@ -3,8 +3,10 @@ package com.softwify.safetynetAlert.service;
 import com.softwify.safetynetAlert.dao.FireStationDao;
 import com.softwify.safetynetAlert.dao.MedicalRecordDao;
 import com.softwify.safetynetAlert.dao.PersonDao;
+import com.softwify.safetynetAlert.dto.Child;
 import com.softwify.safetynetAlert.dto.PersonStarter;
 import com.softwify.safetynetAlert.dto.PersonStation;
+import com.softwify.safetynetAlert.exceptions.PersonNotFoundException;
 import com.softwify.safetynetAlert.exceptions.StationNotFoundException;
 import com.softwify.safetynetAlert.mappers.PersonMapper;
 import com.softwify.safetynetAlert.model.FireStation;
@@ -64,6 +66,16 @@ public class PersonStationServiceImpl implements PersonStationService {
                 .persons(personsFromStation)
                 .numberOfAdults(numberOfAdults)
                 .numberOfChildren(numberOfChildren)
+                .build();
+    }
+
+    public Child findPersonByAddress(String address) {
+        List<Person> personByAddress = personDao.findByAddress(address);
+        if (personByAddress.isEmpty()) {
+            throw new PersonNotFoundException();
+        }
+        return Child.builder()
+                .persons(personByAddress)
                 .build();
     }
 }

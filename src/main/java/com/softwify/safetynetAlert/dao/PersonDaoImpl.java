@@ -20,7 +20,7 @@ public class PersonDaoImpl implements PersonDao {
     }
 
     @Override
-    public Optional<Person> findPersonByFirstnameAndLastname(String firstName, String lastName) {
+    public Optional<Person> findByFirstnameAndLastname(String firstName, String lastName) {
         List<Person> persons = dataStoreManager.getPersons();
         for (Person person : persons) {
             if (person.getFirstName().equals(firstName) && person.getLastName().equals(lastName)) {
@@ -32,7 +32,7 @@ public class PersonDaoImpl implements PersonDao {
 
     @Override
     public Optional<Person> addPerson(Person person) {
-        Optional<Person> personOptional = findPersonByFirstnameAndLastname(person.getFirstName(), person.getLastName());
+        Optional<Person> personOptional = findByFirstnameAndLastname(person.getFirstName(), person.getLastName());
         if (personOptional.isPresent()) {
             return Optional.empty();
         }
@@ -44,7 +44,7 @@ public class PersonDaoImpl implements PersonDao {
 
     @Override
     public Optional<Person> update(Person person) {
-        Optional<Person> optionalPerson = findPersonByFirstnameAndLastname(person.getFirstName(), person.getLastName());
+        Optional<Person> optionalPerson = findByFirstnameAndLastname(person.getFirstName(), person.getLastName());
         if (optionalPerson.isPresent()) {
             Person existingPerson = optionalPerson.get();
 
@@ -61,7 +61,7 @@ public class PersonDaoImpl implements PersonDao {
 
     @Override
     public Optional<Person> delete(String firstname, String lastname) {
-        Optional<Person> optionalPerson = findPersonByFirstnameAndLastname(firstname, lastname);
+        Optional<Person> optionalPerson = findByFirstnameAndLastname(firstname, lastname);
         if (optionalPerson.isPresent()) {
             List<Person> persons = dataStoreManager.getPersons();
             Person person = optionalPerson.get();

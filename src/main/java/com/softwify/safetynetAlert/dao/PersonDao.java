@@ -7,10 +7,9 @@ import java.util.Optional;
 
 public interface PersonDao {
     List<Person> findAll();
-    Optional<Person> findPersonByFirstnameAndLastname(String firstName, String lastName);
+    Optional<Person> findByFirstnameAndLastname(String firstName, String lastName);
     Optional<Person> addPerson(Person person);
     Optional<Person> update(Person person);
     Optional<Person> delete(String firstname, String lastname);
-
     List<Person> findByAddress(String address);
 }

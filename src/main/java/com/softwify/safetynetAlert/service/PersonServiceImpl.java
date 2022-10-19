@@ -25,7 +25,7 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     public Person findByFirstnameLastname(String firstName, String lastName) {
-        Optional<Person> optionalPerson = personDao.findPersonByFirstnameAndLastname(firstName, lastName);
+        Optional<Person> optionalPerson = personDao.findByFirstnameAndLastname(firstName, lastName);
         return optionalPerson.orElseThrow(PersonNotFoundException::new);
     }
 

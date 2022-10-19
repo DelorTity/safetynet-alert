@@ -38,7 +38,7 @@ public class PersonDaoImplTest {
 
         String firstName = "John";
         String lastName = "pierre";
-        Optional<Person> person = personDao.findPersonByFirstnameAndLastname(firstName, lastName);
+        Optional<Person> person = personDao.findByFirstnameAndLastname(firstName, lastName);
         assertTrue(person.isEmpty());
 
         verify(dataStoreManager, times(1)).getPersons();
@@ -52,7 +52,7 @@ public class PersonDaoImplTest {
         );
         when(dataStoreManager.getPersons()).thenReturn(persons);
 
-        Optional<Person> optionalPerson = personDao.findPersonByFirstnameAndLastname("john", "pierre");
+        Optional<Person> optionalPerson = personDao.findByFirstnameAndLastname("john", "pierre");
 
         assertFalse(optionalPerson.isEmpty());
         assertEquals("john", optionalPerson.get().getFirstName());

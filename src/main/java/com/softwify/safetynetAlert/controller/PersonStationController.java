@@ -1,7 +1,8 @@
 package com.softwify.safetynetAlert.controller;
 
+import com.softwify.safetynetAlert.dto.Child;
 import com.softwify.safetynetAlert.dto.PersonStarter;
-import com.softwify.safetynetAlert.dto.PersonStation;
+import com.softwify.safetynetAlert.exceptions.PersonNotFoundException;
 import com.softwify.safetynetAlert.exceptions.StationNotFoundException;
 import com.softwify.safetynetAlert.service.PersonStationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 @RestController
 public class PersonStationController {
     @Autowired
@@ -22,6 +21,16 @@ public class PersonStationController {
             PersonStarter personByStation = personStationService.findPersonByStation(stationNumber);
             return ResponseEntity.ok(personByStation);
         } catch (StationNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping(value = "/childAlert")
+    public ResponseEntity<Child> retrievedChildByAddress(@RequestParam("address") String address) {
+        try {
+            Child personByAddress = personStationService.findPersonByAddress(address);
+            return ResponseEntity.ok(personByAddress);
+        } catch (PersonNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }

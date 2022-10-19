@@ -45,7 +45,7 @@ public class PersonStationServiceImplTest {
                 .birthdate(date1)
                 .build();
 
-        String dateString1 = "31/12/2020";
+        String dateString1 = "31/12/2013";
         Date date2 = new SimpleDateFormat("dd/MM/yyyy").parse(dateString1);
        MedicalRecord medicalRecord2 = MedicalRecord.builder()
                 .birthdate(date2)

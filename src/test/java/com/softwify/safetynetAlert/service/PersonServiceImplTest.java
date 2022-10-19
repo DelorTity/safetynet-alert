@@ -28,22 +28,22 @@ public class PersonServiceImplTest {
         String lastName = "Boyd";
         Person person = Person.builder().firstName("John").lastName("Boyd").build();
         Optional<Person> optionalPerson = Optional.of(person);
-        when(personDao.findPersonByFirstnameAndLastname(firstName, lastName)).thenReturn(optionalPerson);
+        when(personDao.findByFirstnameAndLastname(firstName, lastName)).thenReturn(optionalPerson);
 
         Person personRetrieved = personService.findByFirstnameLastname(firstName, lastName);
         assertNotNull(personRetrieved);
         assertEquals("John", personRetrieved.getFirstName());
         assertEquals("Boyd", personRetrieved.getLastName());
 
-        verify(personDao, times(1)).findPersonByFirstnameAndLastname(firstName, lastName);
+        verify(personDao, times(1)).findByFirstnameAndLastname(firstName, lastName);
     }
 
     @Test
     public void getPersonByFirstnameAndLastnameShouldThrowExceptionWhenThereIsNoPerson() {
-        when(personDao.findPersonByFirstnameAndLastname(anyString(), anyString())).thenReturn(Optional.empty());
+        when(personDao.findByFirstnameAndLastname(anyString(), anyString())).thenReturn(Optional.empty());
 
         assertThrows(PersonNotFoundException.class, () -> personService.findByFirstnameLastname("Jack", "James"));
-        verify(personDao, times(1)).findPersonByFirstnameAndLastname("Jack", "James");
+        verify(personDao, times(1)).findByFirstnameAndLastname("Jack", "James");
     }
 
     @Test
