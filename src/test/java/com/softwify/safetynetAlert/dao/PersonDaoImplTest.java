@@ -61,69 +61,77 @@ public class PersonDaoImplTest {
     }
 
     @Test
-    void addNewPersonIfNotExit() {
-        List<Person> personList = Arrays.asList(
-                Person.builder().firstName("Delor").build(),
-                Person.builder().firstName("Francois").build()
+    public void testShouldVerifyThatPersonSizeAddWhenSaveCorrect() {
+        List<Person> arrayPersons = Arrays.asList(
+                Person.builder().firstName("john").lastName("pierre").build(),
+                Person.builder().firstName("jean").lastName("alfred").build()
         );
-        List<Person> persons = new ArrayList<>(personList);
+        List<Person> persons = new ArrayList<>(arrayPersons);
+
         when(dataStoreManager.getPersons()).thenReturn(persons);
 
-    Person person1 = Person.builder().firstName("Delor")
-            .lastName("Tkf")
-            .address("pk14")
-            .city("douala")
-            .zip(123)
-            .phone("12-56-09")
-            .email ("anze@gmail.com").build();
-    persons.add(person1);
-    assertEquals(3,persons.size());
+        Person person = Person.builder().build();
+        Optional<Person> optionalPerson = personDao.addNewPerson(person);
+
+        assertEquals(3, persons.size());
     }
 
     @Test
-    void testUpdateShouldReturnOkIfPersonExitsAndHasBeenUpdated() {
+    public void testShouldReturnEmptyWhenNotSavingPerson() {
+        List<Person> arrayPersons = Arrays.asList(
+                Person.builder().firstName("john").lastName("pierre").build(),
+                Person.builder().firstName("jean").lastName("alfred").build()
+        );
+        when(dataStoreManager.getPersons()).thenReturn(arrayPersons);
+
+        Person person = Person.builder().firstName("john").lastName("pierre").build();
+
+        Optional<Person> save = personDao.addNewPerson(person);
+
+        assertTrue(save.isEmpty());
+    }
+
+    @Test
+    void testShouldReturnUpdatedPerson() {
         Person updatedPerson = Person.builder()
-                .firstName("Delor")
-                .lastName("Tatus")
+                .firstName("John")
+                .lastName("Boyd")
                 .zip(123)
                 .build();
         when(dataStoreManager.getPersons()).thenReturn(new ArrayList<>(Collections.singleton(updatedPerson)));
 
         Person person = Person.builder()
-                .firstName("Delor")
-                .lastName("Tatus")
+                .firstName("John")
+                .lastName("Boyd")
                 .zip(345)
-                .email("del@gmail.com")
+                .email("anze@gmail.com")
                 .build();
         Optional<Person> optionalPerson = personDao.update(person);
+        assertFalse(optionalPerson.isEmpty());
 
-        assertTrue(optionalPerson.isPresent());
         assertEquals(345, optionalPerson.get().getZip());
-        assertEquals("del@gmail.com", optionalPerson.get().getEmail());
+        assertEquals("anze@gmail.com", optionalPerson.get().getEmail());
 
         verify(dataStoreManager, atLeastOnce()).getPersons();
     }
 
     @Test
-    void testUpdateShouldReturnOkIfPersonExitsHasBeenUpdated() {
+    void testShouldStopWhenThereIsNoBodyToUpdate() {
         Person updatedPerson = Person.builder()
-                .firstName("Delor")
-                .lastName("Tatus")
+                .firstName("John")
+                .lastName("Boyd")
                 .zip(123)
                 .build();
         when(dataStoreManager.getPersons()).thenReturn(new ArrayList<>(Collections.singleton(updatedPerson)));
 
         Person person = Person.builder()
-                .firstName("Delor")
-                .lastName("Tatos")
+                .firstName("John")
+                .lastName("Boydor")
                 .zip(345)
-                .email("del@gmail.com")
+                .email("anze@gmail.com")
                 .build();
         Optional<Person> optionalPerson = personDao.update(person);
-
-        assertFalse(optionalPerson.isPresent());
-
-        verify(dataStoreManager, atLeastOnce()).getPersons();
+        assertTrue(optionalPerson.isEmpty());
     }
 
     @Test
@@ -135,13 +143,13 @@ public class PersonDaoImplTest {
         List<Person> personList = new ArrayList<>(arrayPersons);
         when(dataStoreManager.getPersons()).thenReturn(personList);
 
-        Optional<Person> update = personDao.delete("john", "pierre");
-        assertEquals("john", update.get().getFirstName());
+        Optional<Person> delete = personDao.delete("john", "pierre");
+        assertEquals("john", delete.get().getFirstName());
         verify(dataStoreManager, atLeastOnce()).getPersons();
     }
 
     @Test
-    void deletePersonTestIsFalse() {
+    void deleteShouldStopWhenNoPersonInTheList() {
         List<Person> arrayPersons = Arrays.asList(
                 Person.builder().firstName("john").lastName("pierre").build(),
                 Person.builder().firstName("jean").lastName("alfred").build()
@@ -149,8 +157,8 @@ public class PersonDaoImplTest {
         List<Person> personList = new ArrayList<>(arrayPersons);
         when(dataStoreManager.getPersons()).thenReturn(personList);
 
-        Optional<Person> update = personDao.delete("Delor", "pierre");
-        assertFalse(update.isPresent());
+        Optional<Person> delete = personDao.delete("job", "pierre");
+        assertTrue(delete.isEmpty());
         verify(dataStoreManager, atLeastOnce()).getPersons();
     }
 }

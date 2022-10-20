@@ -10,9 +10,11 @@ public interface PersonService {
 
     Person findByFirstnameLastname(String firstName, String lastName);
 
-    Person save(Person personList);
+    Optional<Person> save(Person personList);
 
     Optional<Person> update(Person person);
 
     Optional<Person> delete(String firstname, String lastname);
+
+    List<Person> findByAddress(String address);
 }

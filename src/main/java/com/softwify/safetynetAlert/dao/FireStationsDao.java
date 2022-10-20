@@ -12,7 +12,10 @@ public interface FireStationsDao {
 
     Optional<FireStation> update(FireStation fireStation);
 
-    Optional<FireStation> findFireStationByAddress(String address);
+    Optional<FireStation> findByAddress(String address);
 
     Optional<FireStation> delete(String address);
+
+    List<FireStation> findByStationNumber(int stationNumber);
+
 }

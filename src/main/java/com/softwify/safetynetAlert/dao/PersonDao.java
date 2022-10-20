@@ -10,9 +10,13 @@ public interface PersonDao {
 
     Optional<Person> findPersonByFirstnameAndLastname(String firstName, String lastName);
 
-    Person addNewPerson(Person person);
+    Optional<Person> addNewPerson(Person person);
 
     Optional<Person> update(Person person);
 
     Optional<Person> delete(String firstname, String lastname);
+
+    List<Person> findByAddress(String address);
+
+    List<Person> findByAddressAccordingTOAge(int stationNumber);
 }

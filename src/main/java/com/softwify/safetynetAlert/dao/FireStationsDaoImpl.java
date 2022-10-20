@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Repository
 public class FireStationsDaoImpl implements FireStationsDao {
@@ -21,15 +22,16 @@ public class FireStationsDaoImpl implements FireStationsDao {
 
     @Override
     public Optional<FireStation> save(FireStation fireStation) {
-        List<FireStation> fireStationList = dataStoreManager.getFireStation();
-        boolean add = fireStationList.add(fireStation);
-        if(add) {
+        Optional<FireStation> optionalFireStation = findByAddress(fireStation.getAddress());
+        if (optionalFireStation.isEmpty()) {
+            List<FireStation> fireStations = dataStoreManager.getFireStation();
+            fireStations.add(fireStation);
             return Optional.of(fireStation);
         }
         return Optional.empty();
     }
 
-    public Optional<FireStation> findFireStationByAddress(String address) {
+    public Optional<FireStation> findByAddress(String address) {
         List<FireStation> fireStations = dataStoreManager.getFireStation();
         for (FireStation fireStation : fireStations) {
             if (fireStation.getAddress().equals(address)) {
@@ -41,7 +43,7 @@ public class FireStationsDaoImpl implements FireStationsDao {
 
     @Override
     public Optional<FireStation> update(FireStation fireStation) {
-        Optional<FireStation> optionalFireStation = findFireStationByAddress(fireStation.getAddress());
+        Optional<FireStation> optionalFireStation = findByAddress(fireStation.getAddress());
         if (optionalFireStation.isPresent()) {
             FireStation existingFireStation = optionalFireStation.get();
             existingFireStation.setAddress(fireStation.getAddress());
@@ -53,7 +55,7 @@ public class FireStationsDaoImpl implements FireStationsDao {
 
     @Override
     public Optional<FireStation> delete(String address) {
-        Optional<FireStation> optionalFireStation = findFireStationByAddress(address);
+        Optional<FireStation> optionalFireStation = findByAddress(address);
         if (optionalFireStation.isPresent()) {
             List<FireStation> fireStations = dataStoreManager.getFireStation();
             FireStation fireStation = optionalFireStation.get();
@@ -61,5 +63,13 @@ public class FireStationsDaoImpl implements FireStationsDao {
             return optionalFireStation;
         }
         return Optional.empty();
+    }
+
+    @Override
+    public List<FireStation> findByStationNumber(int stationNumber) {
+        List<FireStation> fireStations = dataStoreManager.getFireStation();
+        return fireStations.stream()
+                .filter(s -> s.getStation() == stationNumber)
+                .collect(Collectors.toList());
     }
 }

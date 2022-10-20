@@ -99,4 +99,69 @@ class MedicalRecordDaoImplTest {
         Optional<MedicalRecord> optionalMedicalRecord = medicalRecordDao.update(medicalRecord);
         assertFalse(optionalMedicalRecord.isPresent());
     }
+
+    @Test
+    public void testShouldVerifyThatMedicalRecordSizeAddWhenSaveCorrect() {
+        List<MedicalRecord> arrayMedicalRecords = Arrays.asList(MedicalRecord.builder()
+                .firstName("john")
+                .lastName("boyd")
+                .medications(Collections.singletonList("aznol:350mg"))
+                .build()
+        );
+        List<MedicalRecord> medicalRecords = new ArrayList<>(arrayMedicalRecords);
+
+        when(dataStoreManager.getMedicalRecords()).thenReturn(medicalRecords);
+
+        MedicalRecord medicalRecord = MedicalRecord.builder().build();
+        Optional<MedicalRecord> optionalMedicalRecord = medicalRecordDao.save(medicalRecord);
+        assertEquals(2, medicalRecords.size());
+    }
+
+    @Test
+    public void testShouldReturnEmptyWhenNotSavingPerson() {
+        List<MedicalRecord> arrayMedicalRecords = Arrays.asList(MedicalRecord.builder()
+                .firstName("john")
+                .lastName("boyd")
+                .medications(Collections.singletonList("aznol:350mg"))
+                .build()
+        );
+        List<MedicalRecord> medicalRecords = new ArrayList<>(arrayMedicalRecords);
+        when(dataStoreManager.getMedicalRecords()).thenReturn(medicalRecords);
+
+        MedicalRecord medicalRecord = MedicalRecord.builder().firstName("john").lastName("boyd").build();
+        Optional<MedicalRecord> optionalMedicalRecord = medicalRecordDao.save(medicalRecord);
+        assertTrue(optionalMedicalRecord.isEmpty());
+    }
+
+    @Test
+    void testShouldReturnDeletedMedicalRecord() {
+        List<MedicalRecord> arrayMedicalRecords = Arrays.asList(MedicalRecord.builder()
+                .firstName("john")
+                .lastName("boyd")
+                .medications(Collections.singletonList("aznol:350mg"))
+                .build()
+        );
+        List<MedicalRecord> medicalRecords = new ArrayList<>(arrayMedicalRecords);
+        when(dataStoreManager.getMedicalRecords()).thenReturn(medicalRecords);
+
+        Optional<MedicalRecord> delete = medicalRecordDao.delete("john", "boyd");
+        assertEquals("john", delete.get().getFirstName());
+        verify(dataStoreManager, atLeastOnce()).getMedicalRecords();
+    }
+
+    @Test
+    void deleteShouldStopWhenNoMedicalRecordInTheList() {
+        List<MedicalRecord> arrayMedicalRecords = Collections.singletonList(MedicalRecord.builder()
+                .firstName("john")
+                .lastName("boyd")
+                .medications(Collections.singletonList("aznol:350mg"))
+                .build()
+        );
+        List<MedicalRecord> medicalRecords = new ArrayList<>(arrayMedicalRecords);
+        when(dataStoreManager.getMedicalRecords()).thenReturn(medicalRecords);
+
+        Optional<MedicalRecord> delete = medicalRecordDao.delete("pierre", "toma");
+        assertTrue(delete.isEmpty());
+        verify(dataStoreManager, atLeastOnce()).getMedicalRecords();
+    }
 }

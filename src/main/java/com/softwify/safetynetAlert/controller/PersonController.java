@@ -36,10 +36,10 @@ public class PersonController {
     }
 
     @PostMapping
-    public ResponseEntity<Person> save(@RequestBody Person person) throws Exception{
+    public ResponseEntity<Person> save(@RequestBody Person person) {
         try {
-            Person save = personService.save(person);
-            return ResponseEntity.ok(save);
+            Optional<Person> optionalPerson = personService.save(person);
+            return ResponseEntity.ok(optionalPerson.get());
         } catch (PersonAlreadyExitException e) {
             return ResponseEntity.badRequest().build();
         }
@@ -65,4 +65,10 @@ public class PersonController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping(value = "/{address}")
+    public List<Person> findByAddress (@PathVariable String address) {
+        return personService.findByAddress(address);
+    }
+
 }
