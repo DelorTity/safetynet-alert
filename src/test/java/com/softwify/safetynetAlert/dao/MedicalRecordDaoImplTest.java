@@ -151,7 +151,7 @@ class MedicalRecordDaoImplTest {
 
     @Test
     void deleteShouldStopWhenNoMedicalRecordInTheList() {
-        List<MedicalRecord> arrayMedicalRecords = Arrays.asList(MedicalRecord.builder()
+        List<MedicalRecord> arrayMedicalRecords = Collections.singletonList(MedicalRecord.builder()
                 .firstName("john")
                 .lastName("boyd")
                 .medications(Collections.singletonList("aznol:350mg"))

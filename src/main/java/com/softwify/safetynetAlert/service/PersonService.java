@@ -15,4 +15,6 @@ public interface PersonService {
     Optional<Person> update(Person person);
 
     Optional<Person> delete(String firstname, String lastname);
+
+    List<Person> findByAddress(String address);
 }

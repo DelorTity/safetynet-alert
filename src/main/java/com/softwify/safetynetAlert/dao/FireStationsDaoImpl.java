@@ -1,7 +1,6 @@
 package com.softwify.safetynetAlert.dao;
 
 import com.softwify.safetynetAlert.model.FireStation;
-import com.softwify.safetynetAlert.model.Person;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

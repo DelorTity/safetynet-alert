@@ -65,4 +65,10 @@ public class PersonController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping(value = "/{address}")
+    public List<Person> findByAddress (@PathVariable String address) {
+        return personService.findByAddress(address);
+    }
+
 }

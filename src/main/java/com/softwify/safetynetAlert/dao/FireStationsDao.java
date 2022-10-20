@@ -17,4 +17,5 @@ public interface FireStationsDao {
     Optional<FireStation> delete(String address);
 
     List<FireStation> findByStationNumber(int stationNumber);
+
 }

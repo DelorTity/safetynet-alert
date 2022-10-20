@@ -53,4 +53,9 @@ public class PersonServiceImpl implements PersonService {
         }
         return delete;
     }
+
+    @Override
+    public List<Person> findByAddress(String address) {
+        return personDao.findByAddress(address);
+    }
 }
