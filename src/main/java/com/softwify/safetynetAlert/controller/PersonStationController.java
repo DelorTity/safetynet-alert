@@ -31,10 +31,15 @@ public class PersonStationController {
     public ResponseEntity<List<Child>> retrievedChildByAddress(@RequestParam("address") String address) {
         try {
             List<Child> personByAddress = personStationService.findPersonByAddress(address);
-
             return ResponseEntity.ok(personByAddress);
         } catch (PersonNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping(value = "/phoneAlert")
+    public ResponseEntity<List<String>> retrievedPhoneByStationNumber(@RequestParam("firestation") int firestationNumber) {
+        List<String> phoneNumberByStation = personStationService.findPhoneNumberByStation(firestationNumber);
+        return ResponseEntity.ok(phoneNumberByStation);
     }
 }

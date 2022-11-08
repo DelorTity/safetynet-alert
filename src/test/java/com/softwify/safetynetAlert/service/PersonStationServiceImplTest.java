@@ -119,4 +119,31 @@ public class PersonStationServiceImplTest {
             personStationService.findPersonByAddress("yaounde");
         });
     }
+
+    @Test
+    public void getFirestationByStationNumberShouldReturnPhoneNumber() throws ParseException {
+        List<Person> persons = Arrays.asList(
+                Person.builder().firstName("john").lastName("pierre").address("douala").phone("23-997").build(),
+                Person.builder().firstName("liticia").lastName("kouam").address("bafang").build(),
+                Person.builder().firstName("job").lastName("ben").address("yde").phone("111-03").build()
+        );
+
+        List<FireStation> fireStations = Arrays.asList(
+                FireStation.builder().address("douala").station(3).build(),
+                FireStation.builder().address("12-limbe").station(8).build()
+        );
+
+        when(fireStationDao.findByStationNumber(3)).thenReturn(fireStations);
+        when(personDao.findByAddress("douala")).thenReturn(persons);
+
+        List<String> phoneNumberByStation = personStationService.findPhoneNumberByStation(3);
+
+        assertNotNull(phoneNumberByStation);
+        assertEquals(3, phoneNumberByStation.size());
+        assertEquals("23-997", phoneNumberByStation.get(0));
+        assertEquals("111-03", phoneNumberByStation.get(2));
+
+        verify(personDao, times(1)).findByAddress("douala");
+        verify(fireStationDao, times(1)).findByStationNumber(3);
+    }
 }

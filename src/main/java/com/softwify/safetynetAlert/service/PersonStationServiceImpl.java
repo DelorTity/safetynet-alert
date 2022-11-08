@@ -75,7 +75,6 @@ public class PersonStationServiceImpl implements PersonStationService {
             throw new PersonNotFoundException();
         }
 
-
         List<Child> children = new ArrayList<>();
         for (Person person : personByAddress) {
             Optional<MedicalRecord> optionalMedicalRecord = medicalRecordDao.findByFirstnameAndLastname(person.getFirstName(), person.getLastName());
@@ -96,5 +95,20 @@ public class PersonStationServiceImpl implements PersonStationService {
         }
 
         return children;
+    }
+
+    @Override
+    public List<String> findPhoneNumberByStation(int firestationNumber) {
+        List<FireStation> fireStations = fireStationDao.findByStationNumber(firestationNumber);
+
+        List<String> phoneAlerts = new ArrayList<>();
+        for (FireStation fireStation : fireStations) {
+            List<Person> personByAddress = personDao.findByAddress(fireStation.getAddress());
+
+            for (Person person : personByAddress) {
+                phoneAlerts.add(person.getPhone());
+            }
+        }
+        return phoneAlerts;
     }
 }

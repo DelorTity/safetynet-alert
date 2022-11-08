@@ -5,6 +5,7 @@ import com.softwify.safetynetAlert.dto.Child;
 import com.softwify.safetynetAlert.dto.PersonStarter;
 import com.softwify.safetynetAlert.exceptions.PersonNotFoundException;
 import com.softwify.safetynetAlert.exceptions.StationNotFoundException;
+import com.softwify.safetynetAlert.model.FireStation;
 import com.softwify.safetynetAlert.service.PersonStationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +58,7 @@ public class PersonStationControllerTest {
     }
 
     @Test
-    public void testShouldVerfyThatControllerReturnOkStatusWhenExistingStation() throws Exception {
+    public void testShouldVerifyThatControllerReturnOkStatusWhenExistingAddress() throws Exception {
         List<Child> children = Arrays.asList(Child.builder()
                 .firstname("liticia")
                 .lastname("anze")
@@ -72,13 +73,11 @@ public class PersonStationControllerTest {
 
         when(personStationService.findPersonByAddress("loum")).thenReturn(children);
 
-        MvcResult result = mockMvc.perform(get("/childAlert=loum"))
+        MvcResult result = mockMvc.perform(get("/childAlert?address=loum"))
                 .andExpect(status().isOk())
                 .andReturn();
-        String contentAsString = result.getResponse().getContentAsString();
-        Child childrenRetrieved = new ObjectMapper().readValue(contentAsString, Child.class);
+        result.getResponse().getContentAsString();
 
-        assertEquals(16, childrenRetrieved.getAge());
         verify(personStationService, times(1)).findPersonByAddress("loum");
     }
 
@@ -86,8 +85,25 @@ public class PersonStationControllerTest {
     public void testShouldVerifyReturningExceptionWhenThereINoPerson() throws Exception {
         when(personStationService.findPersonByAddress("douala")).thenThrow(PersonNotFoundException.class);
 
-        mockMvc.perform(get("/childAlert=douala"))
+        mockMvc.perform(get("/childAlert?address=douala"))
                 .andExpect(status().isNotFound())
                 .andReturn();
+    }
+
+    @Test
+    public void testShouldVerifyThatControllerReturnOkStatusWhenExistingPhoneNumber() throws Exception {
+        List<String> phoneNumbers = Arrays.asList("124-653",
+                "4324-85"
+        );
+
+        when(personStationService.findPhoneNumberByStation(6)).thenReturn(phoneNumbers);
+
+        MvcResult result = mockMvc.perform(get("/phoneAlert?firestation=6"))
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = result.getResponse().getContentAsString();
+
+        assertEquals(21, contentAsString.length());
+        verify(personStationService, times(1)).findPhoneNumberByStation(6);
     }
 }
