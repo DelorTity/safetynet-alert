@@ -3,7 +3,10 @@ package com.softwify.safetynetAlert.service;
 import com.softwify.safetynetAlert.dto.Child;
 import com.softwify.safetynetAlert.dto.PersonStarter;
 
+import java.util.List;
+
 public interface PersonStationService {
     PersonStarter findPersonByStation(int station);
-    Child findPersonByAddress(String address);
+    List<Child> findPersonByAddress(String address);
+
 }

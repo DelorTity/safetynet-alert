@@ -69,13 +69,32 @@ public class PersonStationServiceImpl implements PersonStationService {
                 .build();
     }
 
-    public Child findPersonByAddress(String address) {
+    public List<Child> findPersonByAddress(String address) {
         List<Person> personByAddress = personDao.findByAddress(address);
         if (personByAddress.isEmpty()) {
             throw new PersonNotFoundException();
         }
-        return Child.builder()
-                .persons(personByAddress)
-                .build();
+
+
+        List<Child> children = new ArrayList<>();
+        for (Person person : personByAddress) {
+            Optional<MedicalRecord> optionalMedicalRecord = medicalRecordDao.findByFirstnameAndLastname(person.getFirstName(), person.getLastName());
+            if (optionalMedicalRecord.isEmpty()) {
+                continue;
+            }
+
+            Date birthdate = optionalMedicalRecord.get().getBirthdate();
+            int age = DateUtils.calculateAge(birthdate);
+            if (age < 18) {
+                children.add(Child.builder().
+                        firstname(optionalMedicalRecord.get().getFirstName()).
+                        lastname(optionalMedicalRecord.get().getLastName())
+                        .age(age)
+                        .build()
+                );
+            }
+        }
+
+        return children;
     }
 }

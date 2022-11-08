@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+
 @RestController
 public class PersonStationController {
     @Autowired
@@ -26,9 +28,10 @@ public class PersonStationController {
     }
 
     @GetMapping(value = "/childAlert")
-    public ResponseEntity<Child> retrievedChildByAddress(@RequestParam("address") String address) {
+    public ResponseEntity<List<Child>> retrievedChildByAddress(@RequestParam("address") String address) {
         try {
-            Child personByAddress = personStationService.findPersonByAddress(address);
+            List<Child> personByAddress = personStationService.findPersonByAddress(address);
+
             return ResponseEntity.ok(personByAddress);
         } catch (PersonNotFoundException e) {
             return ResponseEntity.notFound().build();

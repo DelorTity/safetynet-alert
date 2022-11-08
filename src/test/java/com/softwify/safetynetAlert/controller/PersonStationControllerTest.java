@@ -1,7 +1,9 @@
 package com.softwify.safetynetAlert.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.softwify.safetynetAlert.dto.Child;
 import com.softwify.safetynetAlert.dto.PersonStarter;
+import com.softwify.safetynetAlert.exceptions.PersonNotFoundException;
 import com.softwify.safetynetAlert.exceptions.StationNotFoundException;
 import com.softwify.safetynetAlert.service.PersonStationService;
 import org.junit.jupiter.api.Test;
@@ -10,6 +12,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -49,5 +54,40 @@ public class PersonStationControllerTest {
                 .andReturn();
 
         verify(personStationService, times(1)).findPersonByStation(6);
+    }
+
+    @Test
+    public void testShouldVerfyThatControllerReturnOkStatusWhenExistingStation() throws Exception {
+        List<Child> children = Arrays.asList(Child.builder()
+                .firstname("liticia")
+                .lastname("anze")
+                .age(16)
+                .build(),
+                Child.builder()
+                .firstname("liti")
+                .lastname("akl")
+                .age(6)
+                .build()
+        );
+
+        when(personStationService.findPersonByAddress("loum")).thenReturn(children);
+
+        MvcResult result = mockMvc.perform(get("/childAlert=loum"))
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = result.getResponse().getContentAsString();
+        Child childrenRetrieved = new ObjectMapper().readValue(contentAsString, Child.class);
+
+        assertEquals(16, childrenRetrieved.getAge());
+        verify(personStationService, times(1)).findPersonByAddress("loum");
+    }
+
+    @Test
+    public void testShouldVerifyReturningExceptionWhenThereINoPerson() throws Exception {
+        when(personStationService.findPersonByAddress("douala")).thenThrow(PersonNotFoundException.class);
+
+        mockMvc.perform(get("/childAlert=douala"))
+                .andExpect(status().isNotFound())
+                .andReturn();
     }
 }
