@@ -1,5 +1,6 @@
 package com.softwify.safetynetAlert.controller;
 
+import com.softwify.safetynetAlert.dto.Child;
 import com.softwify.safetynetAlert.dto.PersonStarter;
 import com.softwify.safetynetAlert.dto.PersonStation;
 import com.softwify.safetynetAlert.ecception.StationNotFoundException;
@@ -23,6 +24,16 @@ public class PersonStationController {
             PersonStarter personByStation = personStationService.findPersonByStation(stationNumber);
             return ResponseEntity.ok(personByStation);
         } catch (StationNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping(value = "/childAlert")
+    public ResponseEntity<List<Child>> retrievedChildByAddress(@RequestParam("address") String address) {
+        try {
+            List<Child> children = personStationService.findPersonByAddress(address);
+            return ResponseEntity.ok(children);
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }

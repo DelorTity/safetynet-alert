@@ -3,8 +3,10 @@ package com.softwify.safetynetAlert.service;
 import com.softwify.safetynetAlert.dao.FireStationsDao;
 import com.softwify.safetynetAlert.dao.MedicalRecordDao;
 import com.softwify.safetynetAlert.dao.PersonDao;
+import com.softwify.safetynetAlert.dto.Child;
 import com.softwify.safetynetAlert.dto.PersonStarter;
 import com.softwify.safetynetAlert.dto.PersonStation;
+import com.softwify.safetynetAlert.ecception.PersonNotFoundException;
 import com.softwify.safetynetAlert.ecception.StationNotFoundException;
 import com.softwify.safetynetAlert.mappers.PersonMapper;
 import com.softwify.safetynetAlert.model.FireStation;
@@ -67,5 +69,32 @@ public class PersonStationServiceImpl implements PersonStationService {
                 .numberOfAdults(numberOfAdults)
                 .numberOfChildren(numberOfChildren)
                 .build();
+    }
+
+    @Override
+    public List<Child> findPersonByAddress(String address) {
+        List<Person> childByAddress = personDao.findByAddress(address);
+        if (childByAddress.isEmpty()) {
+            throw new PersonNotFoundException();
+        }
+
+        List<Child> childrenList = new ArrayList<>();
+        for (Person person : childByAddress) {
+            Optional<MedicalRecord> optionalMedicalRecord = medicalRecordDao.findMedicalRecordByFirstnameAndLastname(person.getFirstName(), person.getLastName());
+            if (optionalMedicalRecord.isEmpty()) {
+                continue;
+            }
+
+            Date dateOfBirth = optionalMedicalRecord.get().getBirthdate();
+            int age = DateUtils.calculateAge(dateOfBirth);
+            if (age < 18) {
+                childrenList.add(Child.builder().
+                        firstname(person.getFirstName()).
+                        lastname(person.getLastName()).
+                        age(age).
+                        build());
+            }
+        }
+        return childrenList;
     }
 }

@@ -3,7 +3,9 @@ package com.softwify.safetynetAlert.service;
 import com.softwify.safetynetAlert.dao.FireStationsDao;
 import com.softwify.safetynetAlert.dao.MedicalRecordDao;
 import com.softwify.safetynetAlert.dao.PersonDao;
+import com.softwify.safetynetAlert.dto.Child;
 import com.softwify.safetynetAlert.dto.PersonStarter;
+import com.softwify.safetynetAlert.ecception.PersonNotFoundException;
 import com.softwify.safetynetAlert.ecception.StationNotFoundException;
 import com.softwify.safetynetAlert.model.FireStation;
 import com.softwify.safetynetAlert.model.MedicalRecord;
@@ -73,5 +75,43 @@ public class PersonStationServiceImplTest {
     @Test
     public void getPersonByStationNumberShouldThrowExceptionWhenReturnEmptyList() {
         assertThrows(StationNotFoundException.class, () -> personStationService.findPersonByStation(1));
+    }
+
+    @Test
+    public void getChildByAddressShouldReturnChildrenFoundInAddress() throws ParseException {
+        List<Person> personList = Arrays.asList(
+                Person.builder().firstName("Delor").lastName("Tity").address("Maroua").build(),
+                Person.builder().firstName("Francois").lastName("Komto").address("Maroua").build(),
+                Person.builder().firstName("Leo").lastName("Dim").address("Maroua").build()
+        );
+        String dateString = "09/09/2006";
+        Date dateOne = new SimpleDateFormat("dd/MM/yyyy").parse(dateString);
+        MedicalRecord medicalRecord = MedicalRecord.builder()
+                .birthdate(dateOne)
+                .build();
+        String dateString1 = "01/07/2011";
+        Date dateTwo = new SimpleDateFormat("dd/MM/yyyy").parse(dateString1);
+        MedicalRecord medicalRecord1 = MedicalRecord.builder()
+                .birthdate(dateTwo)
+                .build();
+
+        when(personDao.findByAddress("Maroua")).thenReturn(personList);
+        when(medicalRecordDao.findMedicalRecordByFirstnameAndLastname("Delor", "Tity")).thenReturn(Optional.of(medicalRecord));
+        when(medicalRecordDao.findMedicalRecordByFirstnameAndLastname("Francois", "Komto")).thenReturn(Optional.of(medicalRecord));
+        when(medicalRecordDao.findMedicalRecordByFirstnameAndLastname("Leo", "Dim")).thenReturn(Optional.of(medicalRecord1));
+
+        List<Child> children = personStationService.findPersonByAddress("Maroua");
+
+        assertNotNull(children);
+        assertEquals(3, children.size());
+        assertEquals(11, children.get(2).getAge());
+
+        verify(personDao, times(1)).findByAddress("Maroua");
+
+    }
+
+    @Test
+    public void getPersonByAddressShouldThrowExceptionWhenReturnEmptyList() {
+        assertThrows(PersonNotFoundException.class, () -> personStationService.findPersonByAddress("yaounde"));
     }
 }
