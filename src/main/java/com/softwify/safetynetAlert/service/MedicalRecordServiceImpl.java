@@ -6,8 +6,6 @@ import com.softwify.safetynetAlert.ecception.PersonNotFoundException;
 import com.softwify.safetynetAlert.model.MedicalRecord;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +24,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
     @Override
     public Optional<MedicalRecord> findByFirstnameAndLastname(String firstName, String lastName) {
-        Optional<MedicalRecord> optionalPerson = medicalRecordDao.findMedicalRecordByFirstnameAndLastname(firstName, lastName);
+        Optional<MedicalRecord> optionalPerson = medicalRecordDao.findByFirstnameAndLastname(firstName, lastName);
         return Optional.of(optionalPerson.orElseThrow(PersonNotFoundException::new));
     }
 

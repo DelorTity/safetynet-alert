@@ -1,9 +1,9 @@
 package com.softwify.safetynetAlert.dao;
 
-import com.softwify.safetynetAlert.model.FireStation;
 import com.softwify.safetynetAlert.model.Person;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -73,15 +73,12 @@ public class PersonDaoImpl implements PersonDao {
 
     @Override
     public List<Person> findByAddress(String address) {
-        List<Person> persons = dataStoreManager.getPersons();
-        persons.removeIf(person -> !address.contains(person.getAddress()));
+        List<Person> persons = new ArrayList<>(dataStoreManager.getPersons());
+        persons.removeIf(person -> !address.equals(person.getAddress()));
         return persons;
-    }
 
-    @Override
-    public List<Person> findByAddressAccordingTOAge(int stationNumber) {
-        List<Person> personList = dataStoreManager.getPersons();
-
-        return null;
+        /*return persons.stream()
+                .filter(person -> address.equals(person.getAddress()))
+                .collect(Collectors.toList());*/
     }
 }

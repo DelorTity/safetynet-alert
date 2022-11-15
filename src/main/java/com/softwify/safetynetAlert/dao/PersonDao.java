@@ -17,6 +17,4 @@ public interface PersonDao {
     Optional<Person> delete(String firstname, String lastname);
 
     List<Person> findByAddress(String address);
-
-    List<Person> findByAddressAccordingTOAge(int stationNumber);
 }

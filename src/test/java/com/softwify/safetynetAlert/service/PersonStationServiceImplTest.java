@@ -55,9 +55,9 @@ public class PersonStationServiceImplTest {
 
         when(personDao.findByAddress("douala")).thenReturn(persons);
         when(fireStationDao.findByStationNumber(3)).thenReturn(fireStations);
-        when(medicalRecordDao.findMedicalRecordByFirstnameAndLastname("john", "pierre")).thenReturn(Optional.of(medicalRecord));
-        when(medicalRecordDao.findMedicalRecordByFirstnameAndLastname("Tity", "Delor")).thenReturn(Optional.of(medicalRecord));
-        when(medicalRecordDao.findMedicalRecordByFirstnameAndLastname("joe", "claire")).thenReturn(Optional.of(medicalRecord2));
+        when(medicalRecordDao.findByFirstnameAndLastname("john", "pierre")).thenReturn(Optional.of(medicalRecord));
+        when(medicalRecordDao.findByFirstnameAndLastname("Tity", "Delor")).thenReturn(Optional.of(medicalRecord));
+        when(medicalRecordDao.findByFirstnameAndLastname("joe", "claire")).thenReturn(Optional.of(medicalRecord2));
 
         PersonStarter personByStation = personStationService.findPersonByStation(3);
 
@@ -96,9 +96,9 @@ public class PersonStationServiceImplTest {
                 .build();
 
         when(personDao.findByAddress("Maroua")).thenReturn(personList);
-        when(medicalRecordDao.findMedicalRecordByFirstnameAndLastname("Delor", "Tity")).thenReturn(Optional.of(medicalRecord));
-        when(medicalRecordDao.findMedicalRecordByFirstnameAndLastname("Francois", "Komto")).thenReturn(Optional.of(medicalRecord));
-        when(medicalRecordDao.findMedicalRecordByFirstnameAndLastname("Leo", "Dim")).thenReturn(Optional.of(medicalRecord1));
+        when(medicalRecordDao.findByFirstnameAndLastname("Delor", "Tity")).thenReturn(Optional.of(medicalRecord));
+        when(medicalRecordDao.findByFirstnameAndLastname("Francois", "Komto")).thenReturn(Optional.of(medicalRecord));
+        when(medicalRecordDao.findByFirstnameAndLastname("Leo", "Dim")).thenReturn(Optional.of(medicalRecord1));
 
         List<Child> children = personStationService.findPersonByAddress("Maroua");
 
@@ -113,5 +113,31 @@ public class PersonStationServiceImplTest {
     @Test
     public void getPersonByAddressShouldThrowExceptionWhenReturnEmptyList() {
         assertThrows(PersonNotFoundException.class, () -> personStationService.findPersonByAddress("yaounde"));
+    }
+
+    @Test
+    public void getPhoneNumberByStationNumberShouldReturnPhoneNumbersAtThatStation() {
+        List<Person> personList = Arrays.asList(
+                Person.builder().firstName("delor").phone("695 62 46 91").build(),
+                Person.builder().firstName("tity").phone("677 06 14 06").build(),
+                Person.builder().firstName("leticia").phone("651 95 54 71").build()
+        );
+
+        List<FireStation> fireStations = Arrays.asList(
+                FireStation.builder().address("douala").station(3).build(),
+                FireStation.builder().address("12-limbe").station(5).build()
+        );
+
+        when(fireStationDao.findByStationNumber(3)).thenReturn(fireStations);
+        when(personDao.findByAddress("douala")).thenReturn(personList);
+
+        List<String> phoneNumberByStation = personStationService.findPhoneNumberByStation(3);
+
+        assertNotNull(phoneNumberByStation);
+        assertEquals(3, personList.size());
+        assertEquals("677 06 14 06", personList.get(1).getPhone());
+
+        verify(fireStationDao, times(1)).findByStationNumber(3);
+        verify(personDao, times(1)).findByAddress("douala");
     }
 }

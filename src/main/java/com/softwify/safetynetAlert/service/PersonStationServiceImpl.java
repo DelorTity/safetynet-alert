@@ -6,6 +6,7 @@ import com.softwify.safetynetAlert.dao.PersonDao;
 import com.softwify.safetynetAlert.dto.Child;
 import com.softwify.safetynetAlert.dto.PersonStarter;
 import com.softwify.safetynetAlert.dto.PersonStation;
+import com.softwify.safetynetAlert.ecception.FireStationNotFoundException;
 import com.softwify.safetynetAlert.ecception.PersonNotFoundException;
 import com.softwify.safetynetAlert.ecception.StationNotFoundException;
 import com.softwify.safetynetAlert.mappers.PersonMapper;
@@ -49,7 +50,7 @@ public class PersonStationServiceImpl implements PersonStationService {
         int numberOfAdults = 0;
         int numberOfChildren = 0;
         for (Person person : persons) {
-            Optional<MedicalRecord> optionalMedicalRecord = medicalRecordDao.findMedicalRecordByFirstnameAndLastname(person.getFirstName(), person.getLastName());
+            Optional<MedicalRecord> optionalMedicalRecord = medicalRecordDao.findByFirstnameAndLastname(person.getFirstName(), person.getLastName());
             if (optionalMedicalRecord.isEmpty()) {
                 continue;
             }
@@ -80,7 +81,7 @@ public class PersonStationServiceImpl implements PersonStationService {
 
         List<Child> childrenList = new ArrayList<>();
         for (Person person : childByAddress) {
-            Optional<MedicalRecord> optionalMedicalRecord = medicalRecordDao.findMedicalRecordByFirstnameAndLastname(person.getFirstName(), person.getLastName());
+            Optional<MedicalRecord> optionalMedicalRecord = medicalRecordDao.findByFirstnameAndLastname(person.getFirstName(), person.getLastName());
             if (optionalMedicalRecord.isEmpty()) {
                 continue;
             }
@@ -96,5 +97,23 @@ public class PersonStationServiceImpl implements PersonStationService {
             }
         }
         return childrenList;
+    }
+
+    @Override
+    public List<String> findPhoneNumberByStation(int fireStationNumber) {
+        List<FireStation> fireStations = fireStationDao.findByStationNumber(fireStationNumber);
+        if (fireStations.isEmpty()) {
+            throw new FireStationNotFoundException();
+        }
+
+        List<String> phoneAlerts = new ArrayList<>();
+        for (FireStation fireStation : fireStations) {
+            List<Person> personByAddress = personDao.findByAddress(fireStation.getAddress());
+
+            for (Person person : personByAddress) {
+                phoneAlerts.add(person.getPhone());
+            }
+        }
+        return phoneAlerts;
     }
 }

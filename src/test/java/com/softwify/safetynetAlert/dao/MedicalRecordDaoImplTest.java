@@ -39,7 +39,7 @@ class MedicalRecordDaoImplTest {
                 .build()
         );
         when(dataStoreManager.getMedicalRecords()).thenReturn(medicalRecords);
-        Optional<MedicalRecord> medicalRecord = medicalRecordDao.findMedicalRecordByFirstnameAndLastname("Delor", "Tity");
+        Optional<MedicalRecord> medicalRecord = medicalRecordDao.findByFirstnameAndLastname("Delor", "Tity");
         assertFalse(medicalRecord.isPresent());
 
         verify(dataStoreManager, times(1)).getMedicalRecords();
@@ -55,7 +55,7 @@ class MedicalRecordDaoImplTest {
         );
         when(dataStoreManager.getMedicalRecords()).thenReturn(medicalRecords);
 
-        Optional<MedicalRecord> optionalMedicalRecord = medicalRecordDao.findMedicalRecordByFirstnameAndLastname("jean", "pierre");
+        Optional<MedicalRecord> optionalMedicalRecord = medicalRecordDao.findByFirstnameAndLastname("jean", "pierre");
 
         assertFalse(optionalMedicalRecord.isEmpty());
         assertEquals("jean", optionalMedicalRecord.get().getFirstName());

@@ -2,7 +2,6 @@ package com.softwify.safetynetAlert.controller;
 
 import com.softwify.safetynetAlert.dto.Child;
 import com.softwify.safetynetAlert.dto.PersonStarter;
-import com.softwify.safetynetAlert.dto.PersonStation;
 import com.softwify.safetynetAlert.ecception.StationNotFoundException;
 import com.softwify.safetynetAlert.service.PersonStationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +32,16 @@ public class PersonStationController {
         try {
             List<Child> children = personStationService.findPersonByAddress(address);
             return ResponseEntity.ok(children);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping(value = "/phoneAlert")
+    public ResponseEntity<List<String>> retrievedPhoneNumberByStation(@RequestParam("stationNumber") int stationNumber) {
+        try {
+            List<String> phoneAlerts = personStationService.findPhoneNumberByStation(stationNumber);
+            return ResponseEntity.ok(phoneAlerts);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
