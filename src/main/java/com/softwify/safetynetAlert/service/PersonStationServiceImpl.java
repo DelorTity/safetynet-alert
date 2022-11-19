@@ -4,6 +4,7 @@ import com.softwify.safetynetAlert.dao.FireStationsDao;
 import com.softwify.safetynetAlert.dao.MedicalRecordDao;
 import com.softwify.safetynetAlert.dao.PersonDao;
 import com.softwify.safetynetAlert.dto.Child;
+import com.softwify.safetynetAlert.dto.PersonFire;
 import com.softwify.safetynetAlert.dto.PersonStarter;
 import com.softwify.safetynetAlert.dto.PersonStation;
 import com.softwify.safetynetAlert.ecception.FireStationNotFoundException;
@@ -116,4 +117,35 @@ public class PersonStationServiceImpl implements PersonStationService {
         }
         return phoneAlerts;
     }
+
+    @Override
+    public List<PersonFire> findFireStationByAddress(String address) {
+        List<Person> persons = personDao.findByAddress(address);
+
+        Optional<FireStation> fireStations = fireStationDao.findByAddress(address);
+
+        List<PersonFire> personFireList = new ArrayList<>();
+        for (Person person : persons) {
+            Optional<MedicalRecord> medicalRecord = medicalRecordDao.findByFirstnameAndLastname(person.getFirstName(), person.getLastName());
+            if (medicalRecord.isEmpty()){
+                continue;
+            }
+
+            Date dateOfBirth = medicalRecord.get().getBirthdate();
+            int age = DateUtils.calculateAge(dateOfBirth);
+            personFireList.add(PersonFire.builder()
+                    .stationNumber(fireStations.get().getStation())
+                    .lastname(person.getLastName())
+                    .medications(medicalRecord.get().getMedications())
+                    .allergies(medicalRecord.get().getAllergies())
+                    .age(age)
+                    .phone(person.getPhone())
+                    .build()
+
+            );
+        }
+        return personFireList;
+    }
+
+
 }
