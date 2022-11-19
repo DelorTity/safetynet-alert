@@ -4,21 +4,20 @@ import com.softwify.safetynetAlert.dao.FireStationsDao;
 import com.softwify.safetynetAlert.dao.MedicalRecordDao;
 import com.softwify.safetynetAlert.dao.PersonDao;
 import com.softwify.safetynetAlert.dto.Child;
+import com.softwify.safetynetAlert.dto.PersonFire;
 import com.softwify.safetynetAlert.dto.PersonStarter;
 import com.softwify.safetynetAlert.ecception.PersonNotFoundException;
 import com.softwify.safetynetAlert.ecception.StationNotFoundException;
 import com.softwify.safetynetAlert.model.FireStation;
 import com.softwify.safetynetAlert.model.MedicalRecord;
 import com.softwify.safetynetAlert.model.Person;
+import com.softwify.safetynetAlert.util.DateUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -139,5 +138,54 @@ public class PersonStationServiceImplTest {
 
         verify(fireStationDao, times(1)).findByStationNumber(3);
         verify(personDao, times(1)).findByAddress("douala");
+    }
+
+    @Test
+    public void getPersonsByAddressShouldReturnPersons() throws ParseException {
+        List<Person> personList = Arrays.asList(
+                Person.builder().firstName("Delor").lastName("Tity").address("Douala").phone("657-876").build(),
+                Person.builder().lastName("Komto").address("Douala").phone("777-676").build(),
+                Person.builder().lastName("Kouam").address("Douala").build()
+        );
+
+        FireStation fireStation = FireStation.builder().address("Douala").station(6).build();
+
+        String date = "16/03/2006";
+        Date dateOne = new SimpleDateFormat("dd/MM/yyyy").parse(date);
+        MedicalRecord medicalRecord = MedicalRecord.builder()
+                .medications(Collections.singletonList("para"))
+                .allergies(Collections.singletonList("bread"))
+                .birthdate(dateOne)
+                .build();
+
+        String date1 = "18/06/2010";
+        Date dateTwo = new SimpleDateFormat("dd/MM/yyy").parse(date1);
+        MedicalRecord medicalRecord1 = MedicalRecord.builder()
+                .medications(Collections.singletonList("Efferagant"))
+                .allergies(Collections.singletonList("Lime"))
+                .birthdate(dateTwo)
+                .build();
+
+        when(personDao.findByAddress("Douala")).thenReturn(personList);
+        when(fireStationDao.findByAddress("Douala")).thenReturn(Optional.of(fireStation));
+        when(medicalRecordDao.findByFirstnameAndLastname("Delor", "Tity")).thenReturn(Optional.of(medicalRecord));
+        when(medicalRecordDao.findByFirstnameAndLastname("", "Komto")).thenReturn(Optional.of(medicalRecord1));
+
+        List<PersonFire> personFires = personStationService.findFireStationByAddress("Douala");
+        assertNotNull(personFires);
+        assertEquals(1, personFires.size());
+        assertEquals("657-876", personFires.get(0).getPhone());
+
+        verify(personDao, times(1)).findByAddress("Douala");
+        verify(fireStationDao, times(1)).findByAddress("Douala");
+    }
+
+    @Test
+    public void getPersonsByAddressShouldReturnEmptyList() throws ParseException {
+        List<PersonFire> personFires = personStationService.findFireStationByAddress("Douala");
+        assertEquals(0, personFires.size());
+
+        verify(personDao, times(1)).findByAddress("Douala");
+        verify(fireStationDao, times(1)).findByAddress("Douala");
     }
 }

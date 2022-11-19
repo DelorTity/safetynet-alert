@@ -1,6 +1,7 @@
 package com.softwify.safetynetAlert.controller;
 
 import com.softwify.safetynetAlert.dto.Child;
+import com.softwify.safetynetAlert.dto.PersonFire;
 import com.softwify.safetynetAlert.dto.PersonStarter;
 import com.softwify.safetynetAlert.ecception.StationNotFoundException;
 import com.softwify.safetynetAlert.service.PersonStationService;
@@ -42,6 +43,16 @@ public class PersonStationController {
         try {
             List<String> phoneAlerts = personStationService.findPhoneNumberByStation(stationNumber);
             return ResponseEntity.ok(phoneAlerts);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping(value = "/fire")
+    public ResponseEntity<List<PersonFire>> retrievedFireStationByAddress(@RequestParam("address") String address) {
+        try {
+            List<PersonFire> personFires = personStationService.findFireStationByAddress(address);
+            return ResponseEntity.ok(personFires);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
