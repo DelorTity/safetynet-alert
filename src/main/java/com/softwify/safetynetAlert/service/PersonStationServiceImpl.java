@@ -3,10 +3,7 @@ package com.softwify.safetynetAlert.service;
 import com.softwify.safetynetAlert.dao.FireStationsDao;
 import com.softwify.safetynetAlert.dao.MedicalRecordDao;
 import com.softwify.safetynetAlert.dao.PersonDao;
-import com.softwify.safetynetAlert.dto.Child;
-import com.softwify.safetynetAlert.dto.PersonFire;
-import com.softwify.safetynetAlert.dto.PersonStarter;
-import com.softwify.safetynetAlert.dto.PersonStation;
+import com.softwify.safetynetAlert.dto.*;
 import com.softwify.safetynetAlert.ecception.FireStationNotFoundException;
 import com.softwify.safetynetAlert.ecception.PersonNotFoundException;
 import com.softwify.safetynetAlert.ecception.StationNotFoundException;
@@ -17,10 +14,7 @@ import com.softwify.safetynetAlert.model.Person;
 import com.softwify.safetynetAlert.util.DateUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class PersonStationServiceImpl implements PersonStationService {
@@ -147,5 +141,32 @@ public class PersonStationServiceImpl implements PersonStationService {
         return personFireList;
     }
 
+    @Override
+    public List<FloodStation> findFloodByStationNumber(int stationNumber) {
+        List<FireStation> fireStations = fireStationDao.findByStationNumber(stationNumber);
 
+        List<FloodStation> floodStations = new ArrayList<>();
+        for (FireStation fireStation : fireStations) {
+            List<Person> persons = personDao.findByAddress(fireStation.getAddress());
+            for (Person person : persons) {
+                Optional<MedicalRecord> medicalRecord = medicalRecordDao.findByFirstnameAndLastname(person.getFirstName(), person.getLastName());
+                if (medicalRecord.isEmpty()) {
+                    continue;
+                }
+                Date dateOfBirth = medicalRecord.get().getBirthdate();
+                int age = DateUtils.calculateAge(dateOfBirth);
+                floodStations.add(FloodStation.builder()
+                        .stationNumber(Collections.singletonList(fireStations.get(stationNumber).getStation()))
+                        .lastname(person.getLastName())
+                        .medications(medicalRecord.get().getMedications())
+                        .allergies(medicalRecord.get().getAllergies())
+                        .age(age)
+                        .phone(person.getPhone())
+                        .build()
+
+                );
+            }
+        }
+        return floodStations;
+    }
 }

@@ -1,6 +1,7 @@
 package com.softwify.safetynetAlert.service;
 
 import com.softwify.safetynetAlert.dto.Child;
+import com.softwify.safetynetAlert.dto.FloodStation;
 import com.softwify.safetynetAlert.dto.PersonFire;
 import com.softwify.safetynetAlert.dto.PersonStarter;
 import com.softwify.safetynetAlert.model.FireStation;
@@ -15,4 +16,6 @@ public interface PersonStationService {
     List<String> findPhoneNumberByStation(int fireStationNumber);
 
     List<PersonFire> findFireStationByAddress(String address);
+
+    List<FloodStation> findFloodByStationNumber(int stationNumber);
 }
