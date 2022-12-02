@@ -11,5 +11,5 @@ public interface FireStationService {
     Optional<FireStation> findFireStationByAddress(String adresse);
     Optional<FireStation> updateFireStation(FireStation fireStation);
     Optional<FireStation> deleteFireStation(String adresse);
-
+    List<FireStation> findByStations(List<Integer> stationNumbers);
 }

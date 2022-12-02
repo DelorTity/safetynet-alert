@@ -12,4 +12,5 @@ public interface FireStationDao {
     Optional<FireStation> update(FireStation fireStation);
     Optional<FireStation> delete(String adresse);
     List<FireStation> findByStationNumber(int station);
+    List<FireStation> findByStationNumbers(List<Integer> stationNumbers);
 }

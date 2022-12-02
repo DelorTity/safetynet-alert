@@ -24,18 +24,18 @@ public class PersonServiceImplTest {
 
     @Test
     public void getPersonByFirstnameAndLastnameShouldReturnThePerson() {
-        String firstName = "John";
-        String lastName = "Boyd";
+        String firstname = "John";
+        String lastname = "Boyd";
         Person person = Person.builder().firstName("John").lastName("Boyd").build();
         Optional<Person> optionalPerson = Optional.of(person);
-        when(personDao.findByFirstnameAndLastname(firstName, lastName)).thenReturn(optionalPerson);
+        when(personDao.findByFirstnameAndLastname(firstname, lastname)).thenReturn(optionalPerson);
 
-        Person personRetrieved = personService.findByFirstnameLastname(firstName, lastName);
+        Person personRetrieved = personService.findByFirstnameLastname(firstname, lastname);
         assertNotNull(personRetrieved);
         assertEquals("John", personRetrieved.getFirstName());
         assertEquals("Boyd", personRetrieved.getLastName());
 
-        verify(personDao, times(1)).findByFirstnameAndLastname(firstName, lastName);
+        verify(personDao, times(1)).findByFirstnameAndLastname(firstname, lastname);
     }
 
     @Test

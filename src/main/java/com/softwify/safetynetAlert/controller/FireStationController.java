@@ -1,5 +1,6 @@
 package com.softwify.safetynetAlert.controller;
 
+import com.softwify.safetynetAlert.dto.FloodStation;
 import com.softwify.safetynetAlert.exceptions.FireStationAlreadyExistException;
 import com.softwify.safetynetAlert.exceptions.FireStationNotFoundException;
 import com.softwify.safetynetAlert.exceptions.PersonNotFoundException;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,5 +68,22 @@ public class FireStationController {
         } catch (PersonNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping(value = "/stations")
+    public ResponseEntity<List<FireStation>> retrievedByStationNumbers(@RequestParam("station") String stationNumberString) {
+
+            String input = stationNumberString.trim().replaceAll("\\s+", "");
+            String[] stationNumberInString = input.split(",");
+
+            List<Integer> stationNumbers = new ArrayList<>();
+            for (String stringNumber : stationNumberInString) {
+                    stationNumbers.add(Integer.parseInt(stringNumber));
+                    if (stationNumbers.contains(stringNumber)) {
+                        return ResponseEntity.badRequest().build();
+                    }
+            }
+            List<FireStation> byStations = fireStationService.findByStations(stationNumbers);
+            return ResponseEntity.ok(byStations);
     }
 }

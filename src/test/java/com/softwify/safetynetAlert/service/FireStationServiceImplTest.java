@@ -7,6 +7,10 @@ import com.softwify.safetynetAlert.model.FireStation;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -98,4 +102,18 @@ public class FireStationServiceImplTest {
         verify(fireStationDao, times(1)).delete("12 berlin dr");
     }
 
+    @Test
+    public void testShouldVerifyThatFireStationIsReturn() {
+        List<FireStation> fireStations = Arrays.asList(
+                FireStation.builder().station(3).build(),
+                FireStation.builder().station(10).build());
+
+        when(fireStationDao.findByStationNumbers(anyList())).thenReturn(fireStations);
+
+        List<Integer> numbers = new ArrayList<>();
+        List<FireStation> byStations = fireStationService.findByStations(numbers);
+        assertEquals(3, byStations.get(0).getStation());
+
+        verify(fireStationDao, times(1)).findByStationNumbers(numbers);
+    }
 }
