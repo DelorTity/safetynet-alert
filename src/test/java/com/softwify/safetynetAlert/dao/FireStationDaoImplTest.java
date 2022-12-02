@@ -175,4 +175,39 @@ public class FireStationDaoImplTest {
         assertTrue(firestationByStationNumber.isEmpty());
         verify(dataStoreManager, times(1)).getFireStation();
     }
+
+    @Test
+    public void testShouldReturnEmptyFireStationsWhenExistingStationNumbers() {
+        List<FireStation> fireStations = Arrays.asList(
+                FireStation.builder().address("12-limbe-DR").station(8).build(),
+                FireStation.builder().address("12-limbe").station(8).build(),
+                FireStation.builder().address("129-Douala-DR").station(2).build()
+        );
+        List<Integer> stationNumbers = Arrays.asList(2, 8);
+
+        when(dataStoreManager.getFireStation()).thenReturn(fireStations);
+
+        List<FireStation> fireStationByStationNumbers = fireStationDao.findByStationNumbers(stationNumbers);
+
+        assertFalse(fireStationByStationNumbers.isEmpty());
+        assertEquals("12-limbe-DR", fireStations.get(0).getAddress());
+        assertEquals(2, fireStations.get(2).getStation());
+        verify(dataStoreManager, times(1)).getFireStation();
+    }
+
+    @Test
+    public void testShouldReturnTrueWhenEmptyFireStations() {
+        List<FireStation> fireStations = Arrays.asList(
+                FireStation.builder().address("12-limbe-DR").station(8).build(),
+                FireStation.builder().address("12-limbe").station(8).build(),
+                FireStation.builder().address("129-Douala-DR").station(2).build()
+        );
+        List<Integer> stationNumbers = Arrays.asList(1, 0);
+
+        when(dataStoreManager.getFireStation()).thenReturn(fireStations);
+
+        List<FireStation> fireStationByStationNumbers = fireStationDao.findByStationNumbers(stationNumbers);
+
+        assertTrue(fireStationByStationNumbers.isEmpty());
+    }
 }

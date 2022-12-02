@@ -54,4 +54,9 @@ public class FireStationServiceImpl implements FireStationService{
         }
         return delete;
     }
+
+    @Override
+    public List<FireStation> findByStations(List<Integer> stationNumbers) {
+        return fireStationDao.findByStationNumbers(stationNumbers);
+    }
 }

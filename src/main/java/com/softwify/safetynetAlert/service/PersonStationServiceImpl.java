@@ -3,9 +3,7 @@ package com.softwify.safetynetAlert.service;
 import com.softwify.safetynetAlert.dao.FireStationDao;
 import com.softwify.safetynetAlert.dao.MedicalRecordDao;
 import com.softwify.safetynetAlert.dao.PersonDao;
-import com.softwify.safetynetAlert.dto.Child;
-import com.softwify.safetynetAlert.dto.PersonStarter;
-import com.softwify.safetynetAlert.dto.PersonStation;
+import com.softwify.safetynetAlert.dto.*;
 import com.softwify.safetynetAlert.exceptions.PersonNotFoundException;
 import com.softwify.safetynetAlert.exceptions.StationNotFoundException;
 import com.softwify.safetynetAlert.mappers.PersonMapper;
@@ -110,5 +108,101 @@ public class PersonStationServiceImpl implements PersonStationService {
             }
         }
         return phoneAlerts;
+    }
+
+    @Override
+    public List<PersonFire> findPersonFireByAddress(String address) {
+        List<Person> personDaoByAddress = personDao.findByAddress(address);
+
+        Optional<FireStation> fireStation = fireStationDao.findByAddress(address);
+
+        List<PersonFire> personFires = new ArrayList<>();
+        for (Person person : personDaoByAddress) {
+            Optional<MedicalRecord> optionalMedicalRecord = medicalRecordDao.findByFirstnameAndLastname(person.getFirstName(), person.getLastName());
+            if (optionalMedicalRecord.isEmpty()) {
+                continue;
+            }
+
+            Date birthdate = optionalMedicalRecord.get().getBirthdate();
+            int age = DateUtils.calculateAge(birthdate);
+            personFires.add(PersonFire.builder()
+                    .lastname(person.getLastName())
+                    .phone(person.getPhone())
+                    .stationNumber(fireStation.get().getStation())
+                    .age(age)
+                    .allergies(optionalMedicalRecord.get().getAllergies())
+                    .medications(optionalMedicalRecord.get().getMedications())
+                  .build()
+          );
+        }
+        return personFires;
+    }
+
+    @Override
+    public List<FloodStation> findFloodByStationNumber(List<Integer> stationNumbers) {
+        List<FireStation> fireStations = fireStationDao.findByStationNumbers(stationNumbers);
+
+        List<FloodStation> floodStations = new ArrayList<>();
+        for (FireStation fireStation : fireStations) {
+            List<Person> personDaoByAddress = personDao.findByAddress(fireStation.getAddress());
+
+            for (Person person : personDaoByAddress) {
+                Optional<MedicalRecord> optionalMedicalRecord = medicalRecordDao.findByFirstnameAndLastname(person.getFirstName(), person.getLastName());
+
+                if (optionalMedicalRecord.isEmpty()) {
+                    continue;
+                }
+
+                Date birthdate = optionalMedicalRecord.get().getBirthdate();
+                int age = DateUtils.calculateAge(birthdate);
+
+                floodStations.add(FloodStation.builder()
+                                .allergies(optionalMedicalRecord.get().getAllergies())
+                                .phone(person.getPhone())
+                        .medications(optionalMedicalRecord.get().getMedications())
+                        .lastname(optionalMedicalRecord.get().getLastName())
+                                .age(age)
+                        .build());
+            }
+        }
+        return floodStations;
+    }
+
+    @Override
+    public List<PersonInfo> findPersonByFirstAndLastName(String firstname, String lastname) {
+        List<Person> persons = personDao.findPersons(firstname, lastname);
+        List<PersonInfo> personInfos = new ArrayList<>();
+
+        for (Person person : persons) {
+            Optional<MedicalRecord> optionalMedicalRecord = medicalRecordDao.findByFirstnameAndLastname(person.getFirstName(), person.getLastName());
+            Date birthdate = optionalMedicalRecord.get().getBirthdate();
+            if (optionalMedicalRecord.isEmpty()) {
+                continue;
+            }
+            int age = DateUtils.calculateAge(birthdate);
+
+            personInfos.add(PersonInfo.builder()
+                    .lastname(optionalMedicalRecord.get().getLastName())
+                    .address(person.getAddress())
+                    .email(person.getEmail())
+                    .age(age)
+                    .allergies(optionalMedicalRecord.get().getAllergies())
+                    .medications(optionalMedicalRecord.get().getMedications())
+                    .build());
+        }
+
+        return personInfos;
+    }
+
+    @Override
+    public List<String> findPersonByCity(String city) {
+        List<Person> personByCity = personDao.findByCity(city);
+        List<String> emails = new ArrayList<>();
+
+        for (Person person : personByCity) {
+            emails.add(person.getEmail());
+        }
+
+        return emails;
     }
 }

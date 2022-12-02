@@ -2,10 +2,13 @@ package com.softwify.safetynetAlert.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.softwify.safetynetAlert.dto.Child;
+import com.softwify.safetynetAlert.dto.FloodStation;
+import com.softwify.safetynetAlert.dto.PersonFire;
 import com.softwify.safetynetAlert.dto.PersonStarter;
 import com.softwify.safetynetAlert.exceptions.PersonNotFoundException;
 import com.softwify.safetynetAlert.exceptions.StationNotFoundException;
 import com.softwify.safetynetAlert.model.FireStation;
+import com.softwify.safetynetAlert.model.Person;
 import com.softwify.safetynetAlert.service.PersonStationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -106,4 +110,36 @@ public class PersonStationControllerTest {
         assertEquals(21, contentAsString.length());
         verify(personStationService, times(1)).findPhoneNumberByStation(6);
     }
+
+    @Test
+    public void testShouldVerifyThatControllerReturnOkStatusPhoneNumber() throws Exception {
+        List<PersonFire> persons = Arrays.asList(PersonFire.builder()
+                .lastname("anze")
+                        .stationNumber(3)
+                .phone("124-653")
+                        .medications(Collections.singletonList("aznol:350mg"))
+                        .allergies(Collections.singletonList("palu"))
+                        .age(13)
+                .build(),
+                PersonFire.builder()
+                .lastname("akl")
+                .phone("124-3")
+                        .stationNumber(6)
+                        .medications(Collections.singletonList("aznol:350mg"))
+                        .allergies(Collections.singletonList("palu"))
+                        .age(19)
+                .build()
+        );
+
+        when(personStationService.findPersonFireByAddress("douala")).thenReturn(persons);
+
+        MvcResult result = mockMvc.perform(get("/fire?address=douala"))
+                .andExpect(status().isOk())
+                .andReturn();
+        result.getResponse().getContentAsString();
+
+        verify(personStationService, times(1)).findPersonFireByAddress("douala");
+    }
+
+
 }

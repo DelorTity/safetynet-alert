@@ -199,4 +199,37 @@ public class PersonDaoImplTest {
         assertTrue(address.isEmpty());
         verify(dataStoreManager, times(1)).getPersons();
     }
+
+    @Test
+    public void getPersonByFirstnameAndLastnameShouldReturnPersonsInformations() {
+        List<Person> personList = Arrays.asList(
+                Person.builder().firstName("we").lastName("pierre").address("12-pk17").build(),
+                Person.builder().firstName("allon").lastName("pierre").address("pk8").build(),
+                Person.builder().firstName("john").lastName("alfred").build()
+        );
+        when(dataStoreManager.getPersons()).thenReturn(personList);
+
+        List<Person> persons = personDao.findPersons("john", "pierre");
+
+        assertEquals(3, persons.size());
+        assertEquals("john", persons.get(2).getFirstName());
+        assertEquals("pierre", persons.get(1).getLastName());
+        verify(dataStoreManager, times(1)).getPersons();
+    }
+
+    @Test
+    public void getPersonByCityShouldReturnPersonsInformations() {
+        List<Person> personList = Arrays.asList(
+                Person.builder().firstName("liti").lastName("pierre").address("12-pk17").city("Culver").build(),
+                Person.builder().firstName("allon").lastName("pierre").address("pk8").city("Culver").build(),
+                Person.builder().firstName("john").lastName("alfred").city("douala").build()
+        );
+        when(dataStoreManager.getPersons()).thenReturn(personList);
+
+        List<Person> persons = personDao.findByCity("Culver");
+        assertEquals(2, persons.size());
+        assertEquals("liti", persons.get(0).getFirstName());
+        assertEquals("pierre", persons.get(1).getLastName());
+        verify(dataStoreManager, times(1)).getPersons();
+    }
 }

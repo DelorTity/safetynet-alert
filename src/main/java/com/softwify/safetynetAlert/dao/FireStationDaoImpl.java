@@ -4,6 +4,7 @@ package com.softwify.safetynetAlert.dao;
 import com.softwify.safetynetAlert.model.FireStation;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -74,5 +75,18 @@ public class FireStationDaoImpl implements FireStationDao{
         return fireStations.stream()
                 .filter(s -> s.getStation() == stationNumber)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<FireStation> findByStationNumbers(List<Integer> stationNumbers) {
+        List<FireStation> fireStations = dataStoreManager.getFireStation();
+        List<FireStation> fireStationList = new ArrayList<>();
+        for (FireStation fireStation : fireStations) {
+            if (stationNumbers.contains(fireStation.getStation())) {
+                fireStationList.add(fireStation);
+            }
+        }
+
+        return fireStationList;
     }
 }
