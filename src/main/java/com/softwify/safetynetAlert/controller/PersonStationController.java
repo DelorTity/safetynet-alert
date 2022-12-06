@@ -1,6 +1,7 @@
 package com.softwify.safetynetAlert.controller;
 
 import com.softwify.safetynetAlert.dto.*;
+import com.softwify.safetynetAlert.exceptions.CityNotFoundException;
 import com.softwify.safetynetAlert.exceptions.PersonNotFoundException;
 import com.softwify.safetynetAlert.exceptions.StationNotFoundException;
 import com.softwify.safetynetAlert.service.PersonStationService;
@@ -65,14 +66,18 @@ public class PersonStationController {
     }
 
     @GetMapping(value = "personInfo")
-    public ResponseEntity<List<PersonInfo>> retrievedPersonsByFirstnameLastname(@RequestParam("firstname") String firstname, @RequestParam("lastname") String lastname) {
+    public ResponseEntity<List<PersonInfo>> retrievedPersonsByFirstnameLastname(@RequestParam("firstName") String firstname, @RequestParam("lastName") String lastname) {
         List<PersonInfo> persons = personStationService.findPersonByFirstAndLastName(firstname, lastname);
         return ResponseEntity.ok(persons);
     }
 
     @GetMapping(value = "communityEmail")
     public ResponseEntity<List<String>> retrievedPersonsByCity(@RequestParam("city") String city) {
-        List<String> personByCity = personStationService.findPersonByCity(city);
-        return ResponseEntity.ok(personByCity);
+        try {
+            List<String> personByCity = personStationService.findPersonByCity(city);
+            return ResponseEntity.ok(personByCity);
+        } catch (CityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

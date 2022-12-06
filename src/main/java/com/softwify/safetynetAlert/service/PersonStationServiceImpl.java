@@ -4,6 +4,7 @@ import com.softwify.safetynetAlert.dao.FireStationDao;
 import com.softwify.safetynetAlert.dao.MedicalRecordDao;
 import com.softwify.safetynetAlert.dao.PersonDao;
 import com.softwify.safetynetAlert.dto.*;
+import com.softwify.safetynetAlert.exceptions.CityNotFoundException;
 import com.softwify.safetynetAlert.exceptions.PersonNotFoundException;
 import com.softwify.safetynetAlert.exceptions.StationNotFoundException;
 import com.softwify.safetynetAlert.mappers.PersonMapper;
@@ -202,7 +203,9 @@ public class PersonStationServiceImpl implements PersonStationService {
         for (Person person : personByCity) {
             emails.add(person.getEmail());
         }
-
+        if(emails.isEmpty()) {
+            throw new CityNotFoundException();
+        }
         return emails;
     }
 }

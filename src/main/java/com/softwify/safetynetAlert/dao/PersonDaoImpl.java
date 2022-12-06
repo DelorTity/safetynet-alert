@@ -93,12 +93,12 @@ public class PersonDaoImpl implements PersonDao {
     @Override
     public List<Person> findByCity(String city) {
         List<Person> persons = dataStoreManager.getPersons();
-        List<Person> personCity = new ArrayList<>();
+        List<Person> personByCity = new ArrayList<>();
         for (Person person : persons) {
             if (person.getCity().equals(city)) {
-                personCity.add(person);
+                personByCity.add(person);
             }
         }
-        return personCity;
+        return personByCity;
     }
 }
