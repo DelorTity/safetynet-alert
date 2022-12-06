@@ -4,6 +4,8 @@ import com.softwify.safetynetAlert.dao.FireStationDao;
 import com.softwify.safetynetAlert.dao.MedicalRecordDao;
 import com.softwify.safetynetAlert.dao.PersonDao;
 import com.softwify.safetynetAlert.dto.*;
+import com.softwify.safetynetAlert.exceptions.CityNotFoundException;
+import com.softwify.safetynetAlert.exceptions.FireStationAlreadyExistException;
 import com.softwify.safetynetAlert.exceptions.PersonNotFoundException;
 import com.softwify.safetynetAlert.exceptions.StationNotFoundException;
 import com.softwify.safetynetAlert.model.FireStation;
@@ -243,7 +245,7 @@ public class PersonStationServiceImplTest {
         List<PersonInfo> personInfos = personStationService.findPersonByFirstAndLastName("john", "pierre");
 
         assertEquals(2, personInfos.size());
-        assertEquals(22, personInfos.get(0).getAge());
+        assertEquals(23, personInfos.get(0).getAge());
         assertEquals("douala", personInfos.get(1).getAddress());
 
         verify(personDao, times(1)).findPersons("john", "pierre");
@@ -275,10 +277,9 @@ public class PersonStationServiceImplTest {
     }
 
     @Test
-    public void getPersonByCityShouldReturnEmptyListWhenWrongCity() throws ParseException {
-        List<String> personByCity = personStationService.findPersonByCity("bamenda");
-        assertEquals(0, personByCity.size());
-
+    public void getCityShouldThrowExceptionWhenEmptyList() {
+        String city = "bamenda";
+        assertThrows(CityNotFoundException.class, () -> personStationService.findPersonByCity(city));
         verify(personDao, times(1)).findByCity("bamenda");
     }
 }
