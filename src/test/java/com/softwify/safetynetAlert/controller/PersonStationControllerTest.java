@@ -1,10 +1,8 @@
 package com.softwify.safetynetAlert.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.softwify.safetynetAlert.dto.Child;
-import com.softwify.safetynetAlert.dto.FloodStation;
-import com.softwify.safetynetAlert.dto.PersonFire;
-import com.softwify.safetynetAlert.dto.PersonStarter;
+import com.softwify.safetynetAlert.dto.*;
+import com.softwify.safetynetAlert.exceptions.CityNotFoundException;
 import com.softwify.safetynetAlert.exceptions.PersonNotFoundException;
 import com.softwify.safetynetAlert.exceptions.StationNotFoundException;
 import com.softwify.safetynetAlert.model.FireStation;
@@ -17,6 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -142,33 +141,77 @@ public class PersonStationControllerTest {
     }
 
     @Test
-    public void testShouldVerifyThantrollerReturnOkStatusPhoneNumber() throws Exception {
-        List<PersonFire> persons = Arrays.asList(PersonFire.builder()
+    public void testShouldVerifyThatControllerReturnOkStatusAndFirestations() throws Exception {
+        List<FloodStation> floodStations = Arrays.asList(FloodStation.builder()
                         .lastname("anze")
-                        .stationNumber(3)
                         .phone("124-653")
                         .medications(Collections.singletonList("aznol:350mg"))
                         .allergies(Collections.singletonList("palu"))
                         .age(13)
                         .build(),
-                PersonFire.builder()
+                FloodStation.builder()
                         .lastname("akl")
                         .phone("124-3")
-                        .stationNumber(6)
+                        .medications(Collections.singletonList("abenzl:350mg"))
+                        .allergies(Collections.singletonList("palu"))
+                        .age(19)
+                        .build()
+        );
+        List<Integer> stationNumbers = Arrays.asList(3,8);
+        when(personStationService.findFloodByStationNumber(stationNumbers)).thenReturn(floodStations);
+
+        mockMvc.perform(get("/flood/stations?stations=3,8"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        verify(personStationService, times(1)).findFloodByStationNumber(stationNumbers);
+    }
+
+    @Test
+    public void testShouldVerifyThatPersonInfoControllerReturnOkStatus() throws Exception {
+        List<PersonInfo> persons = Arrays.asList(PersonInfo.builder()
+                        .lastname("anze")
+                        .medications(Collections.singletonList("aznol:350mg"))
+                        .allergies(Collections.singletonList("palu"))
+                        .age(13)
+                        .build(),
+                PersonInfo.builder()
+                        .lastname("akl")
                         .medications(Collections.singletonList("aznol:350mg"))
                         .allergies(Collections.singletonList("palu"))
                         .age(19)
                         .build()
         );
 
-        when(personStationService.findPersonFireByAddress("douala")).thenReturn(persons);
+        when(personStationService.findPersonByFirstAndLastName("anze", "liti")).thenReturn(persons);
 
-        MvcResult result = mockMvc.perform(get("/fire?address=douala"))
+        MvcResult result = mockMvc.perform(get("/personInfo?firstName=anze&lastName=liti"))
                 .andExpect(status().isOk())
                 .andReturn();
         result.getResponse().getContentAsString();
 
-        verify(personStationService, times(1)).findPersonFireByAddress("douala");
+        verify(personStationService, times(1)).findPersonByFirstAndLastName("anze", "liti");
     }
 
+    @Test
+    public void testShouldVerifyThatCityControllerReturnOkStatus() throws Exception {
+        List<String> persons = Arrays.asList("culver", "douala");
+
+        when(personStationService.findPersonByCity("culver")).thenReturn(persons);
+
+        MvcResult result = mockMvc.perform(get("/communityEmail?city=culver"))
+                .andExpect(status().isOk())
+                .andReturn();
+        result.getResponse().getContentAsString();
+
+        verify(personStationService, times(1)).findPersonByCity("culver");
+    }
+
+    @Test
+    public void testShouldVerifyThatCityControllerReturnNotFoundStatus() throws Exception {
+        when(personStationService.findPersonByCity(anyString())).thenThrow(CityNotFoundException.class);
+
+        mockMvc.perform(get("/communityEmail?city=yaounde"))
+                .andExpect(status().isNotFound());
+    }
 }

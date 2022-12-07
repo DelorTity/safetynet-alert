@@ -53,7 +53,7 @@ public class PersonStationController {
     }
 
     @GetMapping(value = "/flood/stations")
-    public ResponseEntity<List<FloodStation>> retrievedFloodStationByStationNumber(@RequestParam("station") String stationNumberString) {
+    public ResponseEntity<List<FloodStation>> retrievedFloodStationByStationNumber(@RequestParam("stations") String stationNumberString) {
 
         String input = stationNumberString.trim().replaceAll("\\s+", "");
         String[] numbersInString = input.split(",");

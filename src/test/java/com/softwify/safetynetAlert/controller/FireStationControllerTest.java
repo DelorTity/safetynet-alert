@@ -119,7 +119,6 @@ public class FireStationControllerTest {
         Optional<FireStation> optionalFireStation = Optional.of(fireStation);
 
         when(fireStationService.updateFireStation(any(FireStation.class))).thenReturn(optionalFireStation);
-        assertTrue(optionalFireStation.isPresent());
 
         String inputJson = new ObjectMapper().writeValueAsString(fireStation);
         mockMvc.perform(put("/firestations")
