@@ -35,7 +35,7 @@ public class PersonStationControllerTest {
     private PersonStationService personStationService;
 
     @Test
-    public void testShouldVerifyThatControllerReturnOkStatusWhenExistingStation() throws Exception {
+    public void testShouldVerifyThatFirestationControllerReturnOkStatusWhenExistingStation() throws Exception {
         PersonStarter personStarter = PersonStarter.builder().numberOfAdults(2).build();
 
         when(personStationService.findPersonByStation(6)).thenReturn(personStarter);
@@ -51,7 +51,7 @@ public class PersonStationControllerTest {
     }
 
     @Test
-    public void testShouldVerifyReturningExceptionWhenThereIsNoStation() throws Exception {
+    public void testShouldVerifyFirestationReturningExceptionWhenThereIsNoStation() throws Exception {
         when(personStationService.findPersonByStation(6)).thenThrow(StationNotFoundException.class);
 
         mockMvc.perform(get("/firestation?stationNumber=6"))
@@ -62,7 +62,7 @@ public class PersonStationControllerTest {
     }
 
     @Test
-    public void testShouldVerifyThatControllerReturnOkStatusWhenExistingAddress() throws Exception {
+    public void testShouldVerifyThatChildAlertControllerReturnOkStatusWhenExistingAddress() throws Exception {
         List<Child> children = Arrays.asList(Child.builder()
                 .firstname("liticia")
                 .lastname("anze")
@@ -86,7 +86,7 @@ public class PersonStationControllerTest {
     }
 
     @Test
-    public void testShouldVerifyReturningExceptionWhenThereINoPerson() throws Exception {
+    public void testShouldVerifyChirldAlertReturningExceptionWhenThereINoPerson() throws Exception {
         when(personStationService.findPersonByAddress("douala")).thenThrow(PersonNotFoundException.class);
 
         mockMvc.perform(get("/childAlert?address=douala"))
@@ -95,7 +95,7 @@ public class PersonStationControllerTest {
     }
 
     @Test
-    public void testShouldVerifyThatControllerReturnOkStatusWhenExistingPhoneNumber() throws Exception {
+    public void testShouldVerifyThatPhoneAlertControllerReturnOkStatusWhenExistingPhoneNumber() throws Exception {
         List<String> phoneNumbers = Arrays.asList("124-653",
                 "4324-85"
         );
@@ -112,7 +112,7 @@ public class PersonStationControllerTest {
     }
 
     @Test
-    public void testShouldVerifyThatControllerReturnOkStatusPhoneNumber() throws Exception {
+    public void testShouldVerifyThatFireControllerReturnOkStatusPhoneNumber() throws Exception {
         List<PersonFire> persons = Arrays.asList(PersonFire.builder()
                 .lastname("anze")
                         .stationNumber(3)
@@ -141,5 +141,34 @@ public class PersonStationControllerTest {
         verify(personStationService, times(1)).findPersonFireByAddress("douala");
     }
 
+    @Test
+    public void testShouldVerifyThantrollerReturnOkStatusPhoneNumber() throws Exception {
+        List<PersonFire> persons = Arrays.asList(PersonFire.builder()
+                        .lastname("anze")
+                        .stationNumber(3)
+                        .phone("124-653")
+                        .medications(Collections.singletonList("aznol:350mg"))
+                        .allergies(Collections.singletonList("palu"))
+                        .age(13)
+                        .build(),
+                PersonFire.builder()
+                        .lastname("akl")
+                        .phone("124-3")
+                        .stationNumber(6)
+                        .medications(Collections.singletonList("aznol:350mg"))
+                        .allergies(Collections.singletonList("palu"))
+                        .age(19)
+                        .build()
+        );
+
+        when(personStationService.findPersonFireByAddress("douala")).thenReturn(persons);
+
+        MvcResult result = mockMvc.perform(get("/fire?address=douala"))
+                .andExpect(status().isOk())
+                .andReturn();
+        result.getResponse().getContentAsString();
+
+        verify(personStationService, times(1)).findPersonFireByAddress("douala");
+    }
 
 }
