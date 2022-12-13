@@ -81,4 +81,27 @@ public class PersonDaoImpl implements PersonDao {
                 .filter(person -> address.equals(person.getAddress()))
                 .collect(Collectors.toList());*/
     }
+    @Override
+    public List<Person> findPersons(String firstName, String lastName) {
+        List<Person> persons = dataStoreManager.getPersons();
+        List<Person> personList = new ArrayList<>();
+        for (Person person : persons) {
+            if (person.getFirstName().equals(firstName) || person.getLastName().equals(lastName)) {
+                personList.add(person);
+            }
+        }
+        return personList;
+    }
+
+    @Override
+    public List<Person> findByCity(String city) {
+        List<Person> persons = dataStoreManager.getPersons();
+        List<Person> personCity = new ArrayList<>();
+        for (Person person : persons) {
+            if (person.getCity().equals(city)) {
+                personCity.add(person);
+            }
+        }
+        return personCity;
+    }
 }

@@ -1,9 +1,6 @@
 package com.softwify.safetynetAlert.controller;
 
-import com.softwify.safetynetAlert.dto.Child;
-import com.softwify.safetynetAlert.dto.FloodStation;
-import com.softwify.safetynetAlert.dto.PersonFire;
-import com.softwify.safetynetAlert.dto.PersonStarter;
+import com.softwify.safetynetAlert.dto.*;
 import com.softwify.safetynetAlert.ecception.StationNotFoundException;
 import com.softwify.safetynetAlert.service.PersonStationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -69,7 +67,19 @@ public class PersonStationController {
         for (String stringNumber : numbersInString) {
             stationNumbers.add(Integer.parseInt(stringNumber));
         }
-        List<FloodStation> floodByStationNumber = personStationService.findFloodByStationNumber(stationNumbers.size());
+        List<FloodStation> floodByStationNumber = personStationService.findFloodByStationNumber(Collections.singletonList(stationNumbers.size()));
         return ResponseEntity.ok(floodByStationNumber);
+    }
+
+    @GetMapping(value = "/personInfo")
+    public ResponseEntity<List<PersonInfo>> retrievedPersonInfoByFirstNameAndLastName(@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
+        List<PersonInfo> persons = personStationService.findPersonByFirstNameAndLastName(firstName, lastName);
+        return ResponseEntity.ok(persons);
+    }
+
+    @GetMapping(value = "/communityEmail")
+    public ResponseEntity<List<String>> retrievedPersonsMailByCity(@RequestParam("city") String city) {
+        List<String> personMail = personStationService.findBYCity(city);
+        return ResponseEntity.ok(personMail);
     }
 }

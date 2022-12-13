@@ -141,9 +141,8 @@ public class PersonStationServiceImpl implements PersonStationService {
         return personFireList;
     }
 
-    @Override
-    public List<FloodStation> findFloodByStationNumber(int stationNumber) {
-        List<FireStation> fireStations = fireStationDao.findByStationNumber(stationNumber);
+    public List<FloodStation> findFloodByStationNumber(List<Integer> stationNumber) {
+        List<FireStation> fireStations = fireStationDao.findByStationNumbers(stationNumber);
 
         List<FloodStation> floodStations = new ArrayList<>();
         for (FireStation fireStation : fireStations) {
@@ -156,7 +155,6 @@ public class PersonStationServiceImpl implements PersonStationService {
                 Date dateOfBirth = medicalRecord.get().getBirthdate();
                 int age = DateUtils.calculateAge(dateOfBirth);
                 floodStations.add(FloodStation.builder()
-                        .stationNumber(Collections.singletonList(fireStations.get(stationNumber).getStation()))
                         .lastname(person.getLastName())
                         .medications(medicalRecord.get().getMedications())
                         .allergies(medicalRecord.get().getAllergies())
@@ -168,5 +166,39 @@ public class PersonStationServiceImpl implements PersonStationService {
             }
         }
         return floodStations;
+    }
+
+    @Override
+    public List<PersonInfo> findPersonByFirstNameAndLastName(String firstName, String lastName) {
+        List<Person> personList = personDao.findPersons(firstName, lastName);
+
+        List<PersonInfo> personInfoList = new ArrayList<>();
+        for (Person person : personList) {
+            Optional<MedicalRecord> medicalRecord = medicalRecordDao.findByFirstnameAndLastname(person.getFirstName(), person.getLastName());
+            if (medicalRecord.isEmpty()){
+                continue;
+            }
+            Date dateOfBirth = medicalRecord.get().getBirthdate();
+            int age = DateUtils.calculateAge(dateOfBirth);
+            personInfoList.add(PersonInfo.builder()
+                    .email(person.getEmail())
+                    .lastname(person.getLastName())
+                    .age(age)
+                    .allergies(medicalRecord.get().getAllergies())
+                    .medication(medicalRecord.get().getMedications())
+                    .build());
+        }
+        return personInfoList;
+    }
+
+    @Override
+    public List<String> findBYCity(String city) {
+        List<Person> personsByCity = personDao.findByCity(city);
+        List<String> email = new ArrayList<>();
+
+        for (Person person : personsByCity) {
+            email.add(person.getEmail());
+        }
+        return email;
     }
 }

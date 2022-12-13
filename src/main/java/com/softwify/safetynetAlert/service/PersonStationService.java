@@ -1,10 +1,6 @@
 package com.softwify.safetynetAlert.service;
 
-import com.softwify.safetynetAlert.dto.Child;
-import com.softwify.safetynetAlert.dto.FloodStation;
-import com.softwify.safetynetAlert.dto.PersonFire;
-import com.softwify.safetynetAlert.dto.PersonStarter;
-import com.softwify.safetynetAlert.model.FireStation;
+import com.softwify.safetynetAlert.dto.*;
 
 import java.util.List;
 
@@ -17,5 +13,9 @@ public interface PersonStationService {
 
     List<PersonFire> findFireStationByAddress(String address);
 
-    List<FloodStation> findFloodByStationNumber(int stationNumber);
+    List<FloodStation> findFloodByStationNumber(List<Integer> stationNumber);
+
+    List<PersonInfo> findPersonByFirstNameAndLastName(String firstName, String lastName);
+
+    List<String> findBYCity(String city);
 }

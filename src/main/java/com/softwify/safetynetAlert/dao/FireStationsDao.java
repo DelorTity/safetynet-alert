@@ -18,4 +18,5 @@ public interface FireStationsDao {
 
     List<FireStation> findByStationNumber(int stationNumber);
 
+    List<FireStation> findByStationNumbers(List<Integer> stationNumbers);
 }
