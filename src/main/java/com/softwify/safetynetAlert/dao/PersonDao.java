@@ -17,4 +17,8 @@ public interface PersonDao {
     Optional<Person> delete(String firstname, String lastname);
 
     List<Person> findByAddress(String address);
+
+    List<Person> findPersons(String firstName, String lastName);
+
+    List<Person> findByCity(String city);
 }
